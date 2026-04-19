@@ -3,112 +3,143 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>관리자 대시보드 — 라이브 투표</title>
-<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<title>투표 관리자</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg: #0A0A0F;
-  --bg2: #12121A;
-  --bg3: #1A1A26;
-  --border: rgba(255,255,255,0.08);
-  --border2: rgba(255,255,255,0.15);
-  --text: #F0F0FF;
-  --text2: #8888AA;
-  --accent: #7C3AED;
-  --accent2: #A855F7;
-  --green: #10B981;
-  --red: #EF4444;
-  --yellow: #F59E0B;
-  --blue: #3B82F6;
-  --glow: 0 0 20px rgba(124,58,237,0.3);
+  --bg: #FFFFFF;
+  --bg2: #F7F7F5;
+  --bg3: #EFEEEB;
+  --border: #E8E7E3;
+  --border2: #D5D4CF;
+  --text: #1A1917;
+  --text2: #787672;
+  --text3: #AEADA9;
+  --accent: #2F80ED;
+  --accent-bg: #EBF3FE;
+  --green: #0F9960;
+  --green-bg: #E6F7EF;
+  --red: #D13438;
+  --red-bg: #FDECEA;
+  --yellow: #B45309;
+  --yellow-bg: #FEF3C7;
+  --purple: #6D28D9;
+  --purple-bg: #EDE9FE;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+  --radius: 8px;
+  --sidebar: 240px;
 }
 
 body {
-  font-family: 'Pretendard', sans-serif;
-  background: var(--bg);
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg2);
   color: var(--text);
   min-height: 100vh;
   display: flex;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
-/* SIDEBAR */
+/* ── SIDEBAR ─────────────────────────────────────── */
 .sidebar {
-  width: 220px;
-  background: var(--bg2);
+  width: var(--sidebar);
+  background: var(--bg);
   border-right: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
   position: fixed;
   top: 0; left: 0; bottom: 0;
+  display: flex;
+  flex-direction: column;
   z-index: 100;
+  overflow-y: auto;
 }
 
-.sidebar-logo {
-  padding: 24px 20px;
+.sidebar-top {
+  padding: 20px 16px 12px;
   border-bottom: 1px solid var(--border);
-  font-size: 16px;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
 }
 
-.sidebar-logo span { font-size: 11px; display: block; color: var(--text2); margin-top: 2px; font-weight: 400; -webkit-text-fill-color: var(--text2); }
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.logo-icon {
+  width: 32px; height: 32px;
+  background: var(--text);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+.logo-sub { font-size: 11px; color: var(--text2); font-weight: 400; }
 
-.sidebar-nav { flex: 1; padding: 12px 0; }
+.sidebar-section { padding: 8px 8px; }
+.sidebar-section-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text3);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 8px 6px;
+}
 
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 11px 20px;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 500;
   color: var(--text2);
-  transition: all 0.2s;
-  border-left: 2px solid transparent;
+  transition: all 0.12s;
+  user-select: none;
 }
-.nav-item:hover { color: var(--text); background: rgba(255,255,255,0.04); }
-.nav-item.active { color: var(--accent2); background: rgba(124,58,237,0.1); border-left-color: var(--accent2); }
-.nav-item .icon { font-size: 18px; width: 22px; text-align: center; }
+.nav-item:hover { background: var(--bg2); color: var(--text); }
+.nav-item.active { background: var(--bg2); color: var(--text); font-weight: 600; }
+.nav-item .ni { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
 
-.sidebar-status {
-  padding: 16px 20px;
+.sidebar-bottom {
+  margin-top: auto;
+  padding: 12px;
   border-top: 1px solid var(--border);
+}
+
+.status-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: 12px;
   color: var(--text2);
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: var(--bg2);
 }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; animation: blink 2s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
-.status-dot {
-  display: inline-block;
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: var(--green);
-  margin-right: 6px;
-  box-shadow: 0 0 6px var(--green);
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
-
-/* MAIN */
+/* ── MAIN ─────────────────────────────────────────── */
 .main {
-  margin-left: 220px;
+  margin-left: var(--sidebar);
   flex: 1;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
 .topbar {
-  background: var(--bg2);
+  background: var(--bg);
   border-bottom: 1px solid var(--border);
-  padding: 0 32px;
-  height: 60px;
+  padding: 0 28px;
+  height: 52px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -117,659 +148,819 @@ body {
   z-index: 50;
 }
 
-.topbar-title { font-size: 18px; font-weight: 700; }
-.topbar-actions { display: flex; gap: 10px; align-items: center; }
+.topbar-left { display: flex; align-items: center; gap: 12px; }
+.topbar-title { font-size: 15px; font-weight: 700; }
+.topbar-right { display: flex; align-items: center; gap: 8px; }
 
+/* ── COMMON ───────────────────────────────────────── */
 .btn {
-  padding: 8px 16px;
-  border-radius: 8px;
-  border: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
   cursor: pointer;
   font-size: 13px;
   font-weight: 600;
   font-family: inherit;
-  transition: all 0.2s;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+  transition: all 0.12s;
+  white-space: nowrap;
 }
-.btn-primary { background: var(--accent); color: white; }
-.btn-primary:hover { background: var(--accent2); box-shadow: var(--glow); }
-.btn-success { background: var(--green); color: white; }
-.btn-success:hover { background: #059669; }
-.btn-danger { background: var(--red); color: white; }
-.btn-danger:hover { background: #DC2626; }
-.btn-ghost { background: rgba(255,255,255,0.06); color: var(--text); }
-.btn-ghost:hover { background: rgba(255,255,255,0.12); }
-.btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 6px; }
-.btn-lg { padding: 12px 24px; font-size: 15px; }
+.btn:active { transform: scale(0.98); }
+.btn-default { background: var(--bg); color: var(--text); border-color: var(--border); }
+.btn-default:hover { background: var(--bg2); border-color: var(--border2); }
+.btn-primary { background: var(--text); color: var(--bg); }
+.btn-primary:hover { opacity: 0.85; }
+.btn-green { background: var(--green); color: white; }
+.btn-green:hover { opacity: 0.88; }
+.btn-red { background: var(--red); color: white; }
+.btn-red:hover { opacity: 0.88; }
+.btn-ghost { background: transparent; color: var(--text2); border-color: transparent; }
+.btn-ghost:hover { background: var(--bg2); color: var(--text); }
+.btn-sm { padding: 4px 10px; font-size: 12px; border-radius: 6px; }
+.btn-lg { padding: 9px 20px; font-size: 14px; }
+.btn-icon { padding: 6px 8px; }
+
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.badge-green { background: var(--green-bg); color: var(--green); }
+.badge-red { background: var(--red-bg); color: var(--red); }
+.badge-yellow { background: var(--yellow-bg); color: var(--yellow); }
+.badge-gray { background: var(--bg3); color: var(--text2); }
+.badge-blue { background: var(--accent-bg); color: var(--accent); }
+.badge-purple { background: var(--purple-bg); color: var(--purple); }
 
 /* PAGE */
-.page { display: none; padding: 32px; }
+.page { display: none; padding: 28px; max-width: 1100px; }
 .page.active { display: block; }
 
-/* SECTION HEADER */
-.section-header { margin-bottom: 24px; }
-.section-title { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
-.section-sub { font-size: 13px; color: var(--text2); }
+.page-header { margin-bottom: 24px; }
+.page-title { font-size: 20px; font-weight: 800; margin-bottom: 3px; }
+.page-sub { font-size: 13px; color: var(--text2); }
 
-/* CARDS */
+/* CARD */
 .card {
-  background: var(--bg2);
+  background: var(--bg);
   border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 24px;
-  transition: border-color 0.2s;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: var(--shadow);
 }
-.card:hover { border-color: var(--border2); }
-.card-title { font-size: 13px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.card-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
 
 /* GRID */
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
-.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.grid { display: grid; gap: 16px; }
+.g2 { grid-template-columns: 1fr 1fr; }
+.g3 { grid-template-columns: 1fr 1fr 1fr; }
+.g4 { grid-template-columns: repeat(4,1fr); }
 
-/* STAT CARDS */
+/* STAT */
 .stat-card {
-  background: var(--bg2);
+  background: var(--bg);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 20px;
+  border-radius: 10px;
+  padding: 18px 20px;
 }
-.stat-label { font-size: 12px; color: var(--text2); margin-bottom: 8px; font-weight: 500; }
-.stat-value { font-size: 32px; font-weight: 800; letter-spacing: -1px; }
-.stat-change { font-size: 12px; color: var(--text2); margin-top: 4px; }
+.stat-label { font-size: 12px; font-weight: 500; color: var(--text2); margin-bottom: 6px; }
+.stat-num { font-size: 28px; font-weight: 800; letter-spacing: -1px; }
+.stat-note { font-size: 11px; color: var(--text3); margin-top: 3px; }
 
-/* TIMER */
-.timer-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-
-.timer-digit-group { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-.timer-digit-label { font-size: 10px; color: var(--text2); font-weight: 500; letter-spacing: 0.1em; }
-.timer-box {
-  background: var(--bg3);
-  border: 2px solid var(--border2);
-  border-radius: 12px;
-  width: 56px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -1px;
-  transition: border-color 0.3s;
-}
-.timer-box.active { border-color: var(--accent2); box-shadow: 0 0 15px rgba(168,85,247,0.3); }
-.timer-sep { font-size: 24px; font-weight: 800; color: var(--text2); padding-bottom: 16px; }
-
-/* TIMER CONTROLS */
-.timer-controls {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-top: 20px;
-}
-
-.timer-input-group { display: flex; align-items: center; gap: 8px; }
-.timer-input-group label { font-size: 13px; color: var(--text2); }
-.timer-input-group input {
-  width: 80px;
-  padding: 7px 12px;
-  background: var(--bg3);
-  border: 1px solid var(--border2);
-  border-radius: 8px;
-  color: var(--text);
-  font-size: 14px;
+/* FORM */
+.form-group { margin-bottom: 14px; }
+.form-label {
+  display: block;
+  font-size: 12px;
   font-weight: 600;
-  font-family: inherit;
-  text-align: center;
+  color: var(--text2);
+  margin-bottom: 5px;
 }
-.timer-input-group input:focus { outline: none; border-color: var(--accent2); }
-
-/* VOTE ITEMS TABLE */
-.items-table-wrapper { overflow: hidden; border-radius: 12px; border: 1px solid var(--border); }
-table { width: 100%; border-collapse: collapse; }
-thead tr { background: var(--bg3); }
-th { padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1px solid var(--border); }
-td { padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 14px; vertical-align: middle; }
-tr:last-child td { border-bottom: none; }
-tbody tr { transition: background 0.15s; }
-tbody tr:hover { background: rgba(255,255,255,0.02); }
-
-.drag-handle { cursor: grab; color: var(--text2); font-size: 18px; }
-.drag-handle:active { cursor: grabbing; }
-
-/* VOTE BAR */
-.vote-bar-wrap { display: flex; align-items: center; gap: 10px; }
-.vote-bar-bg { flex: 1; height: 6px; background: var(--bg3); border-radius: 3px; overflow: hidden; }
-.vote-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
-
-/* PROGRESS CIRCLE */
-.progress-ring { position: relative; display: inline-flex; align-items: center; justify-content: center; }
-
-/* FORM ELEMENTS */
-.form-group { margin-bottom: 16px; }
-.form-label { font-size: 13px; font-weight: 600; color: var(--text2); margin-bottom: 6px; display: block; }
+.form-hint { font-size: 11px; color: var(--text3); margin-top: 3px; }
 .form-input {
   width: 100%;
-  padding: 10px 14px;
-  background: var(--bg3);
+  padding: 8px 11px;
+  background: var(--bg);
   border: 1px solid var(--border2);
-  border-radius: 10px;
+  border-radius: var(--radius);
   color: var(--text);
-  font-size: 14px;
+  font-size: 13.5px;
   font-family: inherit;
-  transition: border-color 0.2s;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  appearance: none;
 }
-.form-input:focus { outline: none; border-color: var(--accent2); }
+.form-input:focus {
+  outline: none;
+  border-color: var(--text);
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.08);
+}
+.form-input::placeholder { color: var(--text3); }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
-
-.color-row { display: flex; align-items: center; gap: 8px; }
-.color-row input[type="color"] {
-  width: 36px; height: 36px;
-  padding: 2px;
-  border-radius: 8px;
-  border: 1px solid var(--border2);
-  background: var(--bg3);
-  cursor: pointer;
-}
-
-/* BADGE */
-.badge {
-  padding: 3px 8px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-.badge-pending { background: rgba(245,158,11,0.2); color: var(--yellow); }
-.badge-approved { background: rgba(16,185,129,0.2); color: var(--green); }
-.badge-rejected { background: rgba(239,68,68,0.2); color: var(--red); }
-.badge-active { background: rgba(16,185,129,0.15); color: var(--green); }
-.badge-inactive { background: rgba(136,136,170,0.15); color: var(--text2); }
 
 /* TOGGLE */
-.toggle-wrap { display: flex; align-items: center; gap: 10px; }
+.toggle-wrap { display: flex; align-items: center; gap: 8px; }
 .toggle {
-  position: relative;
-  width: 44px;
-  height: 24px;
-  cursor: pointer;
+  position: relative; width: 38px; height: 22px; cursor: pointer; flex-shrink: 0;
 }
-.toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
-.toggle-slider {
-  position: absolute;
-  inset: 0;
-  background: var(--bg3);
-  border: 1px solid var(--border2);
-  border-radius: 12px;
-  transition: all 0.3s;
+.toggle input { opacity: 0; position: absolute; }
+.tog-slider {
+  position: absolute; inset: 0;
+  background: var(--border2);
+  border-radius: 11px;
+  transition: background 0.2s;
 }
-.toggle-slider::before {
+.tog-slider::before {
   content: '';
   position: absolute;
   width: 16px; height: 16px;
   left: 3px; top: 3px;
-  background: var(--text2);
+  background: white;
   border-radius: 50%;
-  transition: all 0.3s;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
-.toggle input:checked + .toggle-slider { background: var(--accent); border-color: var(--accent); }
-.toggle input:checked + .toggle-slider::before { transform: translateX(20px); background: white; }
-
-/* SORT SELECTOR */
-.sort-selector { display: flex; gap: 8px; }
-.sort-btn {
-  padding: 7px 14px;
-  border-radius: 8px;
-  border: 1px solid var(--border2);
-  background: var(--bg3);
-  color: var(--text2);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  font-family: inherit;
-  transition: all 0.2s;
-}
-.sort-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
-.sort-btn:hover:not(.active) { border-color: var(--accent2); color: var(--text); }
-
-/* DISPLAY PREVIEW */
-.display-preview {
-  border-radius: 14px;
-  overflow: hidden;
-  border: 1px solid var(--border2);
-  aspect-ratio: 16/9;
-  background: #050508;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  color: var(--text2);
-}
-
-/* NOTIFICATION */
-.toast {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  padding: 14px 20px;
-  background: var(--bg3);
-  border: 1px solid var(--border2);
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 500;
-  z-index: 999;
-  opacity: 0;
-  transform: translateY(10px);
-  transition: all 0.3s;
-  max-width: 320px;
-}
-.toast.show { opacity: 1; transform: translateY(0); }
-.toast.success { border-color: var(--green); color: var(--green); }
-.toast.error { border-color: var(--red); color: var(--red); }
-
-/* TAG */
-.tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 6px; font-size: 12px; background: rgba(124,58,237,0.15); color: var(--accent2); }
-
-/* ITEM EDIT ROW */
-.item-edit-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.item-vote-display { min-width: 40px; text-align: right; font-weight: 700; font-size: 16px; }
+.toggle input:checked + .tog-slider { background: var(--text); }
+.toggle input:checked + .tog-slider::before { transform: translateX(16px); }
 
 /* DIVIDER */
-.divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+hr { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
 
-/* DRAGGING */
-.dragging { opacity: 0.5; background: rgba(124,58,237,0.1) !important; }
-.drag-over { border-top: 2px solid var(--accent2) !important; }
-
-/* RANK NUMBER */
-.rank-num {
-  width: 28px; height: 28px;
-  border-radius: 8px;
-  background: var(--bg3);
-  border: 1px solid var(--border2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 700;
+/* TABLE */
+.tbl-wrap { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--bg); }
+table { width: 100%; border-collapse: collapse; }
+thead tr { background: var(--bg2); }
+th {
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
   color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+td { padding: 11px 14px; border-bottom: 1px solid var(--border); font-size: 13.5px; vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tbody tr { transition: background 0.1s; }
+tbody tr:hover { background: var(--bg2); }
+
+/* COLOR INPUT */
+.color-row { display: flex; align-items: center; gap: 8px; }
+input[type="color"] {
+  width: 34px; height: 34px; border: 1px solid var(--border2);
+  border-radius: 6px; background: none; padding: 2px; cursor: pointer;
 }
 
-/* SCROLLBAR */
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+/* VOTE BAR */
+.vbar-wrap { display: flex; align-items: center; gap: 8px; min-width: 120px; }
+.vbar-bg { flex: 1; height: 5px; background: var(--bg3); border-radius: 3px; overflow: hidden; }
+.vbar-fill { height: 100%; border-radius: 3px; transition: width 0.5s; }
 
-.gap-12 { gap: 12px; }
-.mt-16 { margin-top: 16px; }
-.mt-24 { margin-top: 24px; }
-.mb-16 { margin-bottom: 16px; }
+/* TIMER */
+.timer-big {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.timer-digit { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.timer-digit-label { font-size: 10px; font-weight: 600; color: var(--text3); letter-spacing: 0.1em; }
+.timer-box {
+  width: 58px; height: 62px;
+  background: var(--bg2);
+  border: 1.5px solid var(--border2);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 30px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -1px;
+  transition: all 0.3s;
+}
+.timer-box.running { border-color: var(--accent); color: var(--accent); }
+.timer-box.warning { border-color: var(--yellow); color: var(--yellow); }
+.timer-box.urgent { border-color: var(--red); color: var(--red); animation: tshake 0.25s infinite; }
+@keyframes tshake { 0%,100%{transform:translateX(0)} 30%{transform:translateX(-2px)} 70%{transform:translateX(2px)} }
+.timer-sep { font-size: 24px; font-weight: 800; color: var(--text3); margin-bottom: 14px; }
+
+/* DRAG */
+.drag-handle { cursor: grab; color: var(--text3); font-size: 16px; user-select: none; }
+.drag-handle:active { cursor: grabbing; }
+.dragging-row { opacity: 0.4; }
+.drag-over-row { border-top: 2px solid var(--accent) !important; }
+
+/* SORT CHIPS */
+.sort-chips { display: flex; gap: 4px; }
+.sort-chip {
+  padding: 5px 12px; border-radius: 6px;
+  border: 1px solid var(--border2);
+  background: var(--bg);
+  color: var(--text2);
+  font-size: 12px; font-weight: 600;
+  cursor: pointer; font-family: inherit;
+  transition: all 0.12s;
+}
+.sort-chip.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+.sort-chip:not(.active):hover { background: var(--bg2); }
+
+/* QUICK ACTIONS SECTION */
+.quick-row {
+  display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+}
+.quick-sep { width: 1px; height: 28px; background: var(--border2); flex-shrink: 0; }
+
+/* ADJUST INPUT */
+.adj-input {
+  width: 72px; padding: 5px 8px;
+  border: 1px solid var(--border2); border-radius: 6px;
+  font-size: 13px; font-weight: 600; font-family: inherit;
+  background: var(--bg2); color: var(--text); text-align: center;
+}
+.adj-input:focus { outline: none; border-color: var(--text); }
+
+/* PREVIEW BOX */
+.preview-box {
+  background: #0A0A15;
+  border-radius: 10px;
+  padding: 24px;
+  aspect-ratio: 16/9;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 12px;
+  overflow: hidden;
+}
+.preview-title-el { color: #fff; font-weight: 900; text-align: center; line-height: 1.2; }
+.preview-sub-el { font-weight: 500; text-align: center; }
+.preview-items { width: 100%; display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.preview-item { display: flex; align-items: center; gap: 6px; font-size: 10px; color: rgba(255,255,255,0.8); }
+.preview-bar-bg { flex: 1; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
+.preview-bar-fill { height: 100%; border-radius: 2px; }
+
+/* MODAL */
+.modal-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(2px);
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px;
+  width: 480px;
+  max-width: 95vw;
+  box-shadow: var(--shadow-md);
+}
+.modal-title { font-size: 17px; font-weight: 800; margin-bottom: 20px; }
+.modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 24px; }
+
+/* CONFIRM MODAL */
+.confirm-list { margin: 12px 0; padding-left: 16px; }
+.confirm-list li { font-size: 13px; color: var(--text2); margin-bottom: 4px; }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 20px; right: 20px;
+  padding: 12px 18px;
+  background: var(--text);
+  color: var(--bg);
+  border-radius: 8px;
+  font-size: 13px; font-weight: 600;
+  z-index: 999;
+  opacity: 0; transform: translateY(8px);
+  transition: all 0.25s;
+  pointer-events: none;
+  max-width: 300px;
+  box-shadow: var(--shadow-md);
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+
+/* SECTION HELPER */
+.section-gap { margin-bottom: 16px; }
 .flex { display: flex; }
-.flex-col { flex-direction: column; }
 .items-center { align-items: center; }
 .justify-between { justify-content: space-between; }
 .gap-8 { gap: 8px; }
+.gap-12 { gap: 12px; }
 .gap-16 { gap: 16px; }
-.text-sm { font-size: 13px; }
-.text-xs { font-size: 12px; }
+.mt-8 { margin-top: 8px; }
+.mt-12 { margin-top: 12px; }
+.mt-16 { margin-top: 16px; }
+.mt-20 { margin-top: 20px; }
+.mb-12 { margin-bottom: 12px; }
+.mb-16 { margin-bottom: 16px; }
+.text-sm { font-size: 12px; }
 .text-muted { color: var(--text2); }
-.font-bold { font-weight: 700; }
-.font-800 { font-weight: 800; }
+.font-600 { font-weight: 600; }
+.font-700 { font-weight: 700; }
+.flex-1 { flex: 1; }
+.text-right { text-align: right; }
+.nowrap { white-space: nowrap; }
+
+/* INFO BOX */
+.info-box {
+  background: var(--accent-bg);
+  border: 1px solid #BFDBFE;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 12.5px;
+  color: #1E40AF;
+  line-height: 1.6;
+}
+.info-box b { font-weight: 700; }
+
+/* RANK CHIP */
+.rank-chip {
+  width: 24px; height: 24px;
+  background: var(--bg3);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: var(--text2);
+  flex-shrink: 0;
+}
+
+/* TIMER INPUT */
+.timer-input {
+  width: 80px; padding: 7px 10px;
+  border: 1px solid var(--border2); border-radius: 7px;
+  font-size: 14px; font-weight: 700; font-family: inherit;
+  text-align: center; background: var(--bg2); color: var(--text);
+}
+.timer-input:focus { outline: none; border-color: var(--text); }
+
+/* COLOR SWATCH */
+.swatch { width: 16px; height: 16px; border-radius: 4px; display: inline-block; flex-shrink: 0; border: 1px solid rgba(0,0,0,0.1); }
+
+/* RESPONSIVE gap filler */
+.spacer { flex: 1; }
+
+/* FREE VOTE SETTINGS */
+.free-option {
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.free-option:hover { border-color: var(--border2); }
+.free-option.selected { border-color: var(--text); background: var(--bg2); }
+.free-option-title { font-weight: 600; font-size: 13px; }
+.free-option-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
 </style>
 </head>
 <body>
 
 <!-- SIDEBAR -->
 <aside class="sidebar">
-  <div class="sidebar-logo">
-    🎯 라이브 투표<br>
-    <span>관리자 대시보드</span>
+  <div class="sidebar-top">
+    <div class="logo">
+      <div class="logo-icon">🎯</div>
+      <div>
+        <div>라이브 투표</div>
+        <div class="logo-sub">관리자 패널</div>
+      </div>
+    </div>
   </div>
-  <nav class="sidebar-nav">
-    <div class="nav-item active" onclick="showPage('dashboard')">
-      <span class="icon">📊</span> 대시보드
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">메뉴</div>
+    <div class="nav-item active" onclick="showPage('dashboard')"><span class="ni">📊</span>대시보드</div>
+    <div class="nav-item" onclick="showPage('items')"><span class="ni">📋</span>투표 항목</div>
+    <div class="nav-item" onclick="showPage('free_settings')"><span class="ni">🗳️</span>무료 투표 설정</div>
+    <div class="nav-item" onclick="showPage('display_settings')"><span class="ni">🖥️</span>화면 꾸미기</div>
+    <div class="nav-item" onclick="showPage('settings')"><span class="ni">⚙️</span>기타 설정</div>
+  </div>
+
+  <div class="sidebar-section mt-8">
+    <div class="sidebar-section-label">바로가기</div>
+    <div class="nav-item" onclick="window.open('display.html','_blank')"><span class="ni">🖥️</span>표시 화면 열기</div>
+    <div class="nav-item" onclick="window.open('vote.html','_blank')"><span class="ni">🔗</span>투표 사이트 열기</div>
+  </div>
+
+  <div class="sidebar-bottom">
+    <div class="status-pill">
+      <div class="dot"></div>
+      <span>Supabase 실시간 연결됨</span>
     </div>
-    <div class="nav-item" onclick="showPage('items')">
-      <span class="icon">📋</span> 투표 항목
-    </div>
-    <div class="nav-item" onclick="showPage('settings')">
-      <span class="icon">⚙️</span> 투표 설정
-    </div>
-    <div class="nav-item" onclick="showPage('paid')">
-      <span class="icon">💰</span> 유료 투표 관리
-    </div>
-    <div class="nav-item" onclick="showPage('display_settings')">
-      <span class="icon">🖥️</span> 표시 화면 설정
-    </div>
-  </nav>
-  <div class="sidebar-status">
-    <span class="status-dot"></span>Supabase 연결됨
   </div>
 </aside>
 
 <!-- MAIN -->
 <main class="main">
   <div class="topbar">
-    <div class="topbar-title" id="topbar-title">대시보드</div>
-    <div class="topbar-actions">
-      <span id="vote-status-badge" class="badge badge-inactive">투표 비활성</span>
-      <button class="btn btn-ghost btn-sm" onclick="window.open('display.html','_blank')">🖥️ 표시 화면 열기</button>
-      <button class="btn btn-ghost btn-sm" onclick="window.open('vote.html','_blank')">🗳️ 투표 사이트 열기</button>
+    <div class="topbar-left">
+      <div class="topbar-title" id="topbar-title">대시보드</div>
+      <span id="vote-status-badge" class="badge badge-gray">비활성</span>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-default btn-sm" onclick="openResetModal()">🗑 초기화</button>
+      <button class="btn btn-green btn-sm" onclick="toggleVoteActive(true)" id="btn-start">▶ 투표 시작</button>
+      <button class="btn btn-red btn-sm" onclick="toggleVoteActive(false)" id="btn-stop" style="display:none">■ 투표 종료</button>
     </div>
   </div>
 
-  <!-- DASHBOARD -->
+  <!-- ── DASHBOARD ──────────────────────────────── -->
   <div class="page active" id="page-dashboard">
-    <div class="section-header">
-      <div class="section-title">실시간 현황</div>
-      <div class="section-sub">모든 데이터는 실시간으로 업데이트됩니다</div>
+    <div class="page-header">
+      <div class="page-title">대시보드</div>
+      <div class="page-sub">투표 현황을 한눈에 확인하고 빠르게 제어하세요</div>
     </div>
 
     <!-- QUICK CONTROLS -->
-    <div class="card mb-16">
-      <div class="card-title">⚡ 빠른 제어</div>
-      <div class="flex gap-8 flex-wrap items-center">
-        <button class="btn btn-success btn-lg" onclick="toggleVoteActive(true)">▶ 투표 시작</button>
-        <button class="btn btn-danger btn-lg" onclick="toggleVoteActive(false)">■ 투표 종료</button>
-        <div style="width:1px;height:40px;background:var(--border);margin:0 4px;"></div>
-        <button class="btn btn-primary btn-lg" id="timer-start-btn" onclick="startTimer()">⏱ 타이머 시작</button>
-        <button class="btn btn-ghost btn-lg" onclick="pauseTimer()">⏸ 타이머 정지</button>
-        <button class="btn btn-ghost btn-lg" onclick="resetTimer()">↩ 타이머 초기화</button>
-        <div style="width:1px;height:40px;background:var(--border);margin:0 4px;"></div>
-        <button class="btn btn-ghost btn-lg" onclick="resetAllVotes()">🗑 투표수 초기화</button>
+    <div class="card section-gap">
+      <div class="card-title" style="margin-bottom:12px">⚡ 빠른 제어</div>
+      <div class="quick-row">
+        <button class="btn btn-green btn-lg" onclick="toggleVoteActive(true)">▶ 투표 시작</button>
+        <button class="btn btn-red btn-lg" onclick="toggleVoteActive(false)">■ 투표 종료</button>
+        <div class="quick-sep"></div>
+        <button class="btn btn-primary btn-lg" onclick="startTimer()">⏱ 타이머 시작</button>
+        <button class="btn btn-default btn-lg" onclick="pauseTimer()">⏸ 정지</button>
+        <button class="btn btn-default btn-lg" onclick="resetTimer()">↩ 초기화</button>
+        <div class="quick-sep"></div>
+        <!-- Timer display toggle -->
+        <label class="toggle-wrap">
+          <label class="toggle">
+            <input type="checkbox" id="dash-timer-visible" onchange="toggleTimerVisible(this.checked)" checked>
+            <span class="tog-slider"></span>
+          </label>
+          <span class="text-sm text-muted">타이머 표시</span>
+        </label>
+        <div class="quick-sep"></div>
+        <button class="btn btn-ghost btn-lg" onclick="openResetModal()">🗑 초기화</button>
+      </div>
+
+      <div class="flex gap-8 items-center mt-12" style="flex-wrap:wrap">
+        <div class="text-sm text-muted">타이머 시간(초):</div>
+        <input class="timer-input" type="number" id="timer-set-input" value="60" min="5" max="7200" onchange="setTimerDuration()">
+        <div class="timer-big">
+          <div class="timer-digit">
+            <div class="timer-digit-label">분</div>
+            <div class="timer-box" id="dash-timer-min">00</div>
+          </div>
+          <div class="timer-sep">:</div>
+          <div class="timer-digit">
+            <div class="timer-digit-label">초</div>
+            <div class="timer-box" id="dash-timer-sec">00</div>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- STATS -->
-    <div class="grid-4 mb-16">
+    <div class="grid g4 section-gap">
       <div class="stat-card">
         <div class="stat-label">총 투표수</div>
-        <div class="stat-value" id="stat-total" style="color:var(--accent2)">0</div>
-        <div class="stat-change" id="stat-total-change">—</div>
+        <div class="stat-num" id="stat-total">0</div>
+        <div class="stat-note">전체 누적</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">무료 투표</div>
-        <div class="stat-value" id="stat-free" style="color:var(--green)">0</div>
-        <div class="stat-change">실시간</div>
+        <div class="stat-num" id="stat-free">0</div>
+        <div class="stat-note">실시간</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">유료 투표</div>
-        <div class="stat-value" id="stat-paid" style="color:var(--yellow)">0</div>
-        <div class="stat-change">승인된 항목</div>
+        <div class="stat-num" id="stat-paid">0</div>
+        <div class="stat-note">수동 추가</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">투표 항목 수</div>
-        <div class="stat-value" id="stat-items" style="color:var(--blue)">0</div>
-        <div class="stat-change">활성 항목</div>
+        <div class="stat-label">항목 수</div>
+        <div class="stat-num" id="stat-items">0</div>
+        <div class="stat-note">활성 항목</div>
       </div>
     </div>
 
-    <!-- TIMER + ITEMS -->
-    <div class="grid-2 gap-16">
-      <!-- TIMER CARD -->
-      <div class="card">
-        <div class="card-title">⏱ 타이머</div>
-        <div class="timer-container" id="timer-display">
-          <div class="timer-digit-group">
-            <div class="timer-digit-label">분</div>
-            <div class="timer-box" id="timer-min">00</div>
-          </div>
-          <div class="timer-sep">:</div>
-          <div class="timer-digit-group">
-            <div class="timer-digit-label">초</div>
-            <div class="timer-box" id="timer-sec">00</div>
-          </div>
-        </div>
-        <div class="timer-controls">
-          <div class="timer-input-group">
-            <label>설정 시간(초)</label>
-            <input type="number" id="timer-set-input" value="60" min="5" max="7200" onchange="setTimerDuration()">
-          </div>
-        </div>
-      </div>
-
-      <!-- TOP ITEMS CARD -->
-      <div class="card">
-        <div class="card-title">🏆 상위 항목</div>
-        <div id="dashboard-top-items" style="display:flex;flex-direction:column;gap:10px;">
-          <div class="text-muted text-sm">항목 없음</div>
-        </div>
+    <!-- TOP ITEMS -->
+    <div class="card">
+      <div class="card-title" style="margin-bottom:14px">🏆 실시간 순위</div>
+      <div id="dash-top-items">
+        <div class="text-muted text-sm">항목 없음</div>
       </div>
     </div>
   </div>
 
-  <!-- ITEMS PAGE -->
+  <!-- ── ITEMS ──────────────────────────────────── -->
   <div class="page" id="page-items">
-    <div class="section-header flex justify-between items-center">
+    <div class="page-header flex justify-between items-center">
       <div>
-        <div class="section-title">투표 항목 관리</div>
-        <div class="section-sub">항목을 추가하고 표수를 실시간으로 조정하세요</div>
+        <div class="page-title">투표 항목 관리</div>
+        <div class="page-sub">항목 추가, 표수 조정, 순서 변경을 한 화면에서</div>
       </div>
-      <div class="flex gap-8">
-        <div class="sort-selector" id="sort-selector">
-          <button class="sort-btn" onclick="setSortOrder('desc')">표 많은순 ▼</button>
-          <button class="sort-btn" onclick="setSortOrder('asc')">표 적은순 ▲</button>
-          <button class="sort-btn active" onclick="setSortOrder('manual')">직접 설정 ✦</button>
+      <div class="flex gap-8 items-center">
+        <div class="sort-chips" id="sort-chips">
+          <button class="sort-chip" onclick="setSortOrder('desc')">많은순 ▼</button>
+          <button class="sort-chip" onclick="setSortOrder('asc')">적은순 ▲</button>
+          <button class="sort-chip active" onclick="setSortOrder('manual')">직접 설정</button>
         </div>
-        <button class="btn btn-primary" onclick="showAddItemModal()">+ 항목 추가</button>
+        <button class="btn btn-primary" onclick="openAddModal()">+ 항목 추가</button>
       </div>
     </div>
 
-    <div class="card">
-      <div class="items-table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th style="width:40px"></th>
-              <th style="width:40px">#</th>
-              <th>항목명</th>
-              <th>색상</th>
-              <th style="width:180px">현재 표수</th>
-              <th style="width:160px">표수 직접 조정</th>
-              <th style="width:120px">작업</th>
-            </tr>
-          </thead>
-          <tbody id="items-tbody">
-            <tr><td colspan="7" style="text-align:center;color:var(--text2);padding:40px">항목이 없습니다. 항목을 추가하세요.</td></tr>
-          </tbody>
-        </table>
-      </div>
+    <!-- ADD / HOW TO -->
+    <div class="info-box mb-16">
+      <b>💡 표수 조정 방법:</b> 각 항목 오른쪽 입력칸에 숫자를 입력 후 <b>적용</b> 버튼을 누르세요.<br>
+      예시: <b>+15</b> 입력 → 15표 추가 / <b>-10</b> 입력 → 10표 차감 / <b>=50</b> 입력 → 50표로 직접 설정
+    </div>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:32px"></th>
+            <th style="width:32px">#</th>
+            <th>항목명</th>
+            <th style="width:80px">색상</th>
+            <th style="width:200px">현재 표수</th>
+            <th style="width:220px">표수 조정</th>
+            <th style="width:90px">작업</th>
+          </tr>
+        </thead>
+        <tbody id="items-tbody">
+          <tr><td colspan="7" style="text-align:center;color:var(--text2);padding:40px">항목이 없습니다. 항목을 추가해보세요.</td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
-  <!-- SETTINGS PAGE -->
-  <div class="page" id="page-settings">
-    <div class="section-header">
-      <div class="section-title">투표 설정</div>
-      <div class="section-sub">투표 세션의 기본 설정을 관리합니다</div>
+  <!-- ── FREE VOTE SETTINGS ──────────────────────── -->
+  <div class="page" id="page-free_settings">
+    <div class="page-header">
+      <div class="page-title">무료 투표 설정</div>
+      <div class="page-sub">방문자 1인당 무료 투표 횟수를 설정합니다</div>
     </div>
-    <div class="grid-2 gap-16">
+
+    <div class="grid g2 gap-16">
       <div class="card">
-        <div class="card-title">🎯 기본 설정</div>
-        <div class="form-group">
-          <label class="form-label">투표 제목</label>
-          <input type="text" class="form-input" id="s-title" placeholder="투표 제목 입력..." oninput="autoSaveSetting('title', this.value)">
+        <div class="card-title" style="margin-bottom:14px">🗳️ 무료 투표 방식</div>
+
+        <div class="info-box mb-16">
+          <b>💡 안내:</b> 방문자는 브라우저에 저장된 ID로 식별됩니다.<br>
+          시크릿 창이나 다른 브라우저를 쓰면 새로운 사용자로 인식될 수 있습니다.
         </div>
-        <div class="form-group">
-          <label class="form-label">부제목</label>
-          <input type="text" class="form-input" id="s-subtitle" placeholder="부제목 입력..." oninput="autoSaveSetting('subtitle', this.value)">
+
+        <div style="display:flex;flex-direction:column;gap:8px;" id="free-mode-options">
+          <div class="free-option" onclick="selectFreeMode('unlimited')">
+            <div class="free-option-title">🚫 투표 불가 (비활성)</div>
+            <div class="free-option-sub">무료 투표를 완전히 막습니다</div>
+          </div>
+          <div class="free-option" onclick="selectFreeMode('limited')">
+            <div class="free-option-title">📊 제한 투표</div>
+            <div class="free-option-sub">1인당 설정한 횟수만 가능</div>
+          </div>
+          <div class="free-option" onclick="selectFreeMode('free')">
+            <div class="free-option-title">♾️ 무제한 투표</div>
+            <div class="free-option-sub">횟수 제한 없이 자유롭게</div>
+          </div>
         </div>
-        <div class="form-row">
+
+        <div id="free-count-group" class="mt-16">
           <div class="form-group">
-            <label class="form-label">무료 투표 횟수/인</label>
-            <input type="number" class="form-input" id="s-free-votes" min="1" max="100" value="3" onchange="autoSaveSetting('free_votes_per_user', this.value)">
+            <label class="form-label">1인당 무료 투표 횟수</label>
+            <input class="form-input" type="number" id="free-count-input" value="3" min="1" max="999" style="max-width:120px">
+            <div class="form-hint">1~999 사이 값. 현재 설정: <span id="free-count-display">3</span>표</div>
           </div>
-          <div class="form-group">
-            <label class="form-label">기본 타이머 시간(초)</label>
-            <input type="number" class="form-input" id="s-timer" min="5" max="7200" value="60" onchange="autoSaveSetting('timer_seconds', this.value)">
-          </div>
+          <button class="btn btn-primary" onclick="saveFreeSettings()">저장</button>
         </div>
-        <div class="form-group">
-          <label class="form-label">항목 번호 표시</label>
-          <div class="toggle-wrap">
-            <label class="toggle"><input type="checkbox" id="s-show-numbers" checked onchange="autoSaveSetting('show_numbers', this.checked)"><span class="toggle-slider"></span></label>
-            <span class="text-sm text-muted">투표 화면에 항목 번호 표시</span>
-          </div>
-        </div>
-        <button class="btn btn-primary" onclick="saveSettings()">설정 저장</button>
       </div>
 
       <div class="card">
-        <div class="card-title">📋 정렬 순서</div>
-        <div class="form-group">
-          <label class="form-label">투표 항목 정렬</label>
-          <div class="sort-selector flex-col gap-8" style="flex-direction:column;">
-            <button class="sort-btn" id="sort-desc-btn" onclick="setSortOrder('desc')">📉 표 많은순</button>
-            <button class="sort-btn" id="sort-asc-btn" onclick="setSortOrder('asc')">📈 표 적은순</button>
-            <button class="sort-btn active" id="sort-manual-btn" onclick="setSortOrder('manual')">✦ 직접 설정 (드래그)</button>
-          </div>
+        <div class="card-title" style="margin-bottom:14px">📈 현재 무료 투표 현황</div>
+        <div id="free-stats-list">
+          <div class="text-muted text-sm">데이터 로딩 중...</div>
         </div>
+        <hr>
+        <div class="text-sm text-muted">총 무료 투표 수: <b id="free-total-count">0</b>표</div>
       </div>
     </div>
   </div>
 
-  <!-- PAID VOTES -->
-  <div class="page" id="page-paid">
-    <div class="section-header flex justify-between items-center">
-      <div>
-        <div class="section-title">유료 투표 관리</div>
-        <div class="section-sub">송금 확인 후 투표를 승인하세요</div>
-      </div>
-      <button class="btn btn-ghost" onclick="loadPaidRequests()">↻ 새로고침</button>
-    </div>
-
-    <div class="card">
-      <div class="items-table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>시간</th>
-              <th>이름</th>
-              <th>항목</th>
-              <th>표수</th>
-              <th>입금 메모</th>
-              <th>상태</th>
-              <th>작업</th>
-            </tr>
-          </thead>
-          <tbody id="paid-tbody">
-            <tr><td colspan="7" style="text-align:center;color:var(--text2);padding:40px">유료 투표 요청 없음</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- DISPLAY SETTINGS -->
+  <!-- ── DISPLAY SETTINGS ───────────────────────── -->
   <div class="page" id="page-display_settings">
-    <div class="section-header">
-      <div class="section-title">표시 화면 설정</div>
-      <div class="section-sub">유튜브 라이브에 표시되는 화면을 커스터마이즈하세요 — 변경사항은 실시간으로 적용됩니다</div>
+    <div class="page-header">
+      <div class="page-title">화면 꾸미기</div>
+      <div class="page-sub">표시 화면의 텍스트, 색상, 배경을 설정합니다. 변경 즉시 반영됩니다.</div>
     </div>
 
-    <div class="grid-2 gap-16">
+    <div class="grid g2 gap-16">
       <div style="display:flex;flex-direction:column;gap:16px;">
+
         <div class="card">
-          <div class="card-title">📝 텍스트 설정</div>
+          <div class="card-title" style="margin-bottom:14px">📝 텍스트 설정</div>
           <div class="form-group">
-            <label class="form-label">제목 텍스트</label>
-            <input type="text" class="form-input" id="d-title" oninput="autoSaveSetting('title', this.value); updatePreview()">
+            <label class="form-label">제목</label>
+            <input class="form-input" type="text" id="d-title" placeholder="투표 제목..." oninput="autoSaveSetting('title',this.value);updatePreview()">
           </div>
           <div class="form-group">
-            <label class="form-label">부제목 텍스트</label>
-            <input type="text" class="form-input" id="d-subtitle" oninput="autoSaveSetting('subtitle', this.value); updatePreview()">
+            <label class="form-label">부제목</label>
+            <input class="form-input" type="text" id="d-subtitle" placeholder="부제목..." oninput="autoSaveSetting('subtitle',this.value);updatePreview()">
           </div>
           <div class="form-row">
             <div class="form-group">
               <label class="form-label">제목 크기 (px)</label>
-              <input type="number" class="form-input" id="d-title-size" value="48" min="16" max="120" oninput="autoSaveSetting('title_size', parseInt(this.value)); updatePreview()">
+              <input class="form-input" type="number" id="d-title-size" value="48" min="16" max="120" oninput="autoSaveSetting('title_size',parseInt(this.value));updatePreview()">
             </div>
             <div class="form-group">
               <label class="form-label">부제목 크기 (px)</label>
-              <input type="number" class="form-input" id="d-subtitle-size" value="24" min="12" max="72" oninput="autoSaveSetting('subtitle_size', parseInt(this.value)); updatePreview()">
+              <input class="form-input" type="number" id="d-subtitle-size" value="24" min="12" max="72" oninput="autoSaveSetting('subtitle_size',parseInt(this.value));updatePreview()">
             </div>
           </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="margin-bottom:14px">🎨 색상 설정</div>
           <div class="form-row">
             <div class="form-group">
               <label class="form-label">제목 색상</label>
               <div class="color-row">
-                <input type="color" id="d-title-color" value="#FFFFFF" oninput="autoSaveSetting('title_color', this.value); updatePreview()">
-                <input type="text" class="form-input" id="d-title-color-text" value="#FFFFFF" oninput="document.getElementById('d-title-color').value=this.value;autoSaveSetting('title_color',this.value);updatePreview();" style="flex:1">
+                <input type="color" id="d-title-color" value="#FFFFFF" oninput="syncColor('d-title-color','d-title-color-text');autoSaveSetting('title_color',this.value);updatePreview()">
+                <input class="form-input" type="text" id="d-title-color-text" value="#FFFFFF" style="flex:1" oninput="syncColor('d-title-color-text','d-title-color');autoSaveSetting('title_color',this.value);updatePreview()">
               </div>
             </div>
             <div class="form-group">
               <label class="form-label">부제목 색상</label>
               <div class="color-row">
-                <input type="color" id="d-subtitle-color" value="#A78BFA" oninput="autoSaveSetting('subtitle_color', this.value); updatePreview()">
-                <input type="text" class="form-input" id="d-subtitle-color-text" value="#A78BFA" oninput="document.getElementById('d-subtitle-color').value=this.value;autoSaveSetting('subtitle_color',this.value);updatePreview();" style="flex:1">
+                <input type="color" id="d-subtitle-color" value="#A78BFA" oninput="syncColor('d-subtitle-color','d-subtitle-color-text');autoSaveSetting('subtitle_color',this.value);updatePreview()">
+                <input class="form-input" type="text" id="d-subtitle-color-text" value="#A78BFA" style="flex:1" oninput="syncColor('d-subtitle-color-text','d-subtitle-color');autoSaveSetting('subtitle_color',this.value);updatePreview()">
               </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">배경 색상</label>
+            <div class="flex gap-8 items-center flex-wrap">
+              <div class="color-row">
+                <input type="color" id="d-bg-color" value="#0B0B15" oninput="syncColor('d-bg-color','d-bg-color-text');autoSaveSetting('bg_color',this.value);updatePreview()">
+                <input class="form-input" type="text" id="d-bg-color-text" value="#0B0B15" style="width:120px" oninput="syncColor('d-bg-color-text','d-bg-color');autoSaveSetting('bg_color',this.value);updatePreview()">
+              </div>
+              <div class="text-sm text-muted">— 미리 정의된 배경 →</div>
+              <button class="btn btn-default btn-sm" onclick="setBg('#0B0B15')">🌑 다크</button>
+              <button class="btn btn-default btn-sm" onclick="setBg('#FFFFFF')">☀️ 화이트</button>
+              <button class="btn btn-default btn-sm" onclick="setBg('#0A1628')">🌊 딥블루</button>
+              <button class="btn btn-default btn-sm" onclick="setBg('#0F0A20')">🟣 딥퍼플</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">배경 이펙트</label>
+            <div class="toggle-wrap">
+              <label class="toggle">
+                <input type="checkbox" id="d-bg-effect" checked onchange="autoSaveSetting('bg_effect',this.checked);updatePreview()">
+                <span class="tog-slider"></span>
+              </label>
+              <span class="text-sm text-muted">오브 이펙트 표시</span>
             </div>
           </div>
         </div>
 
         <div class="card">
-          <div class="card-title">🖥️ 화면 제어</div>
-          <div class="flex gap-8 flex-wrap">
-            <button class="btn btn-success" onclick="toggleVoteActive(true)">▶ 투표 시작</button>
-            <button class="btn btn-danger" onclick="toggleVoteActive(false)">■ 투표 종료</button>
-            <button class="btn btn-primary" onclick="startTimer()">⏱ 타이머 시작</button>
-            <button class="btn btn-ghost" onclick="pauseTimer()">⏸ 정지</button>
-            <button class="btn btn-ghost" onclick="resetTimer()">↩ 초기화</button>
+          <div class="card-title" style="margin-bottom:14px">⏱ 타이머 표시</div>
+          <div class="toggle-wrap">
+            <label class="toggle">
+              <input type="checkbox" id="d-timer-visible" checked onchange="toggleTimerVisible(this.checked)">
+              <span class="tog-slider"></span>
+            </label>
+            <span class="text-sm text-muted">표시 화면에 타이머 보이기</span>
+          </div>
+          <div class="form-hint mt-8">끄면 display.html에서 타이머가 숨겨집니다</div>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="margin-bottom:14px">🔢 항목 번호 표시</div>
+          <div class="toggle-wrap">
+            <label class="toggle">
+              <input type="checkbox" id="d-show-numbers" checked onchange="autoSaveSetting('show_numbers',this.checked);updatePreview()">
+              <span class="tog-slider"></span>
+            </label>
+            <span class="text-sm text-muted">투표 항목 앞에 번호 표시</span>
           </div>
         </div>
       </div>
 
-      <!-- MINI PREVIEW -->
-      <div class="card">
-        <div class="card-title">👁 미리보기</div>
-        <div class="display-preview" id="mini-preview">
-          <div style="text-align:center;width:100%;padding:20px;">
-            <div id="preview-title" style="font-size:28px;font-weight:800;color:#fff;margin-bottom:8px;">라이브 투표</div>
-            <div id="preview-subtitle" style="font-size:14px;color:#A78BFA;">지금 바로 투표하세요!</div>
-            <div style="margin-top:16px;display:flex;flex-direction:column;gap:6px;" id="preview-items"></div>
+      <!-- PREVIEW -->
+      <div>
+        <div class="card" style="position:sticky;top:68px;">
+          <div class="card-title" style="margin-bottom:12px">👁 미리보기</div>
+          <div class="preview-box" id="preview-box">
+            <div class="preview-title-el" id="preview-title" style="font-size:28px">🎯 라이브 투표</div>
+            <div class="preview-sub-el" id="preview-sub" style="font-size:14px;color:#A78BFA">지금 바로 투표하세요!</div>
+            <div class="preview-items" id="preview-items"></div>
+          </div>
+          <div class="mt-12">
+            <button class="btn btn-default btn-sm" onclick="window.open('display.html','_blank')">🖥️ 실제 화면 새 탭으로 열기</button>
           </div>
         </div>
-        <div style="margin-top:12px;">
-          <button class="btn btn-ghost btn-sm" onclick="window.open('display.html','_blank')">🖥️ 실제 화면 새 탭으로 열기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SETTINGS ───────────────────────────────── -->
+  <div class="page" id="page-settings">
+    <div class="page-header">
+      <div class="page-title">기타 설정</div>
+      <div class="page-sub">정렬, 제목 설정</div>
+    </div>
+
+    <div class="grid g2 gap-16">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:14px">📝 기본 텍스트</div>
+        <div class="form-group">
+          <label class="form-label">투표 제목</label>
+          <input class="form-input" type="text" id="s-title" placeholder="투표 제목" oninput="autoSaveSetting('title',this.value)">
+        </div>
+        <div class="form-group">
+          <label class="form-label">부제목</label>
+          <input class="form-input" type="text" id="s-subtitle" placeholder="부제목" oninput="autoSaveSetting('subtitle',this.value)">
+        </div>
+        <button class="btn btn-primary" onclick="saveSettings()">저장</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title" style="margin-bottom:14px">📊 항목 정렬</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div class="free-option" id="sort-desc-opt" onclick="setSortOrder('desc')">
+            <div class="free-option-title">📉 표 많은 순</div>
+            <div class="free-option-sub">투표가 많은 항목이 위로</div>
+          </div>
+          <div class="free-option" id="sort-asc-opt" onclick="setSortOrder('asc')">
+            <div class="free-option-title">📈 표 적은 순</div>
+            <div class="free-option-sub">투표가 적은 항목이 위로</div>
+          </div>
+          <div class="free-option selected" id="sort-manual-opt" onclick="setSortOrder('manual')">
+            <div class="free-option-title">✦ 직접 설정 (드래그)</div>
+            <div class="free-option-sub">항목 페이지에서 드래그로 순서 조정</div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </main>
 
-<!-- ADD ITEM MODAL -->
-<div id="modal-bg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;backdrop-filter:blur(4px);" onclick="closeModal()">
-  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:32px;width:480px;max-width:90vw;" onclick="e=>e.stopPropagation()">
-    <div style="font-size:18px;font-weight:800;margin-bottom:24px;" id="modal-title">항목 추가</div>
+<!-- ── ADD/EDIT ITEM MODAL ─────────────────────────── -->
+<div class="modal-overlay" id="item-modal" onclick="closeItemModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title" id="item-modal-title">항목 추가</div>
     <div class="form-group">
       <label class="form-label">항목명 *</label>
-      <input type="text" class="form-input" id="modal-label" placeholder="예: 팀 A">
+      <input class="form-input" type="text" id="modal-label" placeholder="예: 팀 A" onkeydown="if(event.key==='Enter')saveItem()">
     </div>
     <div class="form-group">
       <label class="form-label">설명 (선택)</label>
-      <input type="text" class="form-input" id="modal-desc" placeholder="짧은 설명...">
+      <input class="form-input" type="text" id="modal-desc" placeholder="짧은 설명 (생략 가능)">
     </div>
     <div class="form-group">
       <label class="form-label">항목 색상</label>
       <div class="color-row">
-        <input type="color" id="modal-color" value="#7C3AED">
-        <input type="text" class="form-input" id="modal-color-text" value="#7C3AED" oninput="document.getElementById('modal-color').value=this.value" style="flex:1">
+        <input type="color" id="modal-color" value="#2F80ED" oninput="document.getElementById('modal-color-text').value=this.value">
+        <input class="form-input" type="text" id="modal-color-text" value="#2F80ED" style="flex:1" oninput="document.getElementById('modal-color').value=this.value">
+      </div>
+      <div class="flex gap-8 mt-8 flex-wrap">
+        <div style="cursor:pointer" onclick="setModalColor('#2F80ED')"><div style="width:22px;height:22px;border-radius:5px;background:#2F80ED;border:1px solid rgba(0,0,0,0.1)"></div></div>
+        <div style="cursor:pointer" onclick="setModalColor('#10B981')"><div style="width:22px;height:22px;border-radius:5px;background:#10B981;border:1px solid rgba(0,0,0,0.1)"></div></div>
+        <div style="cursor:pointer" onclick="setModalColor('#EF4444')"><div style="width:22px;height:22px;border-radius:5px;background:#EF4444;border:1px solid rgba(0,0,0,0.1)"></div></div>
+        <div style="cursor:pointer" onclick="setModalColor('#F59E0B')"><div style="width:22px;height:22px;border-radius:5px;background:#F59E0B;border:1px solid rgba(0,0,0,0.1)"></div></div>
+        <div style="cursor:pointer" onclick="setModalColor('#EC4899')"><div style="width:22px;height:22px;border-radius:5px;background:#EC4899;border:1px solid rgba(0,0,0,0.1)"></div></div>
+        <div style="cursor:pointer" onclick="setModalColor('#8B5CF6')"><div style="width:22px;height:22px;border-radius:5px;background:#8B5CF6;border:1px solid rgba(0,0,0,0.1)"></div></div>
+        <div style="cursor:pointer" onclick="setModalColor('#06B6D4')"><div style="width:22px;height:22px;border-radius:5px;background:#06B6D4;border:1px solid rgba(0,0,0,0.1)"></div></div>
+        <div style="cursor:pointer" onclick="setModalColor('#F97316')"><div style="width:22px;height:22px;border-radius:5px;background:#F97316;border:1px solid rgba(0,0,0,0.1)"></div></div>
       </div>
     </div>
-    <div class="flex gap-8 justify-between" style="margin-top:24px;">
-      <button class="btn btn-ghost" onclick="closeModal()">취소</button>
+    <div class="modal-footer">
+      <button class="btn btn-default" onclick="closeItemModal()">취소</button>
       <button class="btn btn-primary" onclick="saveItem()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── RESET CONFIRM MODAL ─────────────────────────── -->
+<div class="modal-overlay" id="reset-modal" onclick="closeResetModal()">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-title">⚠️ 초기화 확인</div>
+    <div style="font-size:13.5px;color:var(--text2);line-height:1.6;">초기화하면 다음 데이터가 삭제됩니다:</div>
+    <ul class="confirm-list">
+      <li>모든 항목의 투표수 (0으로 초기화)</li>
+      <li>투표 기록 (vote_records)</li>
+      <li>무료 투표 사용량 (free_vote_usage)</li>
+    </ul>
+    <div style="font-size:13px;color:var(--red);font-weight:600;margin-top:8px;">⚠️ 이 작업은 되돌릴 수 없습니다.</div>
+    <div class="modal-footer">
+      <button class="btn btn-default" onclick="closeResetModal()">취소</button>
+      <button class="btn btn-red" onclick="doReset()">초기화 진행</button>
     </div>
   </div>
 </div>
@@ -785,165 +976,182 @@ const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 let settings = {};
 let items = [];
 let editingItemId = null;
-let localTimer = null;
+let localTimer = 0;
 let timerInterval = null;
+let currentFreeMode = 'limited';
 
-// NAV
+// ── NAV ─────────────────────────────────
+const NAV_LABELS = {dashboard:'대시보드',items:'투표 항목',free_settings:'무료 투표 설정',display_settings:'화면 꾸미기',settings:'기타 설정'};
+
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('page-' + id).classList.add('active');
-  document.querySelectorAll('.nav-item')[['dashboard','items','settings','paid','display_settings'].indexOf(id)].classList.add('active');
-  const titles = {dashboard:'대시보드',items:'투표 항목 관리',settings:'투표 설정',paid:'유료 투표 관리',display_settings:'표시 화면 설정'};
-  document.getElementById('topbar-title').textContent = titles[id] || '';
-  if(id === 'paid') loadPaidRequests();
+  document.getElementById('page-'+id).classList.add('active');
+  const navItems = document.querySelectorAll('.nav-item');
+  const order = ['dashboard','items','free_settings','display_settings','settings'];
+  const idx = order.indexOf(id);
+  if(navItems[idx]) navItems[idx].classList.add('active');
+  document.getElementById('topbar-title').textContent = NAV_LABELS[id] || '';
+  if(id === 'free_settings') renderFreeStats();
+  if(id === 'display_settings') updatePreview();
 }
 
-// TOAST
-function toast(msg, type='success') {
+// ── TOAST ───────────────────────────────
+function toast(msg, type='default') {
   const el = document.getElementById('toast');
   el.textContent = msg;
-  el.className = 'toast show ' + type;
-  setTimeout(() => el.classList.remove('show'), 3000);
+  el.style.background = type === 'error' ? 'var(--red)' : type === 'success' ? 'var(--green)' : 'var(--text)';
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 2800);
 }
 
-// SETTINGS
+// ── SETTINGS ────────────────────────────
 async function loadSettings() {
   const { data } = await db.from('vote_settings').select('*').eq('id','00000000-0000-0000-0000-000000000001').single();
-  if(data) {
-    settings = data;
-    applySettings();
-  }
+  if(data) { settings = data; applySettings(); }
 }
 
 function applySettings() {
-  const ids = ['title','subtitle','free_votes_per_user','timer_seconds','show_numbers','title_color','subtitle_color','title_size','subtitle_size'];
-  const map = {title:['s-title','d-title'],subtitle:['s-subtitle','d-subtitle'],free_votes_per_user:['s-free-votes'],timer_seconds:['s-timer','timer-set-input'],title_size:['d-title-size'],subtitle_size:['d-subtitle-size']};
-  
-  for(const [key, els] of Object.entries(map)) {
-    for(const id of els) {
-      const el = document.getElementById(id);
-      if(el) el.value = settings[key] ?? '';
-    }
-  }
-  
-  const snEl = document.getElementById('s-show-numbers');
-  if(snEl) snEl.checked = settings.show_numbers ?? true;
-  
+  // Inputs
+  setVal('s-title', settings.title);
+  setVal('s-subtitle', settings.subtitle);
+  setVal('d-title', settings.title);
+  setVal('d-subtitle', settings.subtitle);
+  setVal('d-title-size', settings.title_size || 48);
+  setVal('d-subtitle-size', settings.subtitle_size || 24);
+  setVal('timer-set-input', settings.timer_seconds || 60);
+
   // Colors
-  ['title','subtitle'].forEach(k => {
-    const c = settings[k+'_color'] || (k==='title'?'#FFFFFF':'#A78BFA');
-    const cp = document.getElementById('d-'+k+'-color');
-    const ct = document.getElementById('d-'+k+'-color-text');
-    if(cp) cp.value = c;
-    if(ct) ct.value = c;
-  });
+  setColorPair('d-title-color', 'd-title-color-text', settings.title_color || '#FFFFFF');
+  setColorPair('d-subtitle-color', 'd-subtitle-color-text', settings.subtitle_color || '#A78BFA');
+  setColorPair('d-bg-color', 'd-bg-color-text', settings.bg_color || '#0B0B15');
+
+  // Toggles
+  setCheck('d-show-numbers', settings.show_numbers !== false);
+  const timerVis = settings.timer_visible !== false;
+  setCheck('d-timer-visible', timerVis);
+  setCheck('dash-timer-visible', timerVis);
+  const bgEffect = settings.bg_effect !== false;
+  setCheck('d-bg-effect', bgEffect);
 
   // Timer
-  localTimer = settings.timer_remaining ?? settings.timer_seconds ?? 60;
-  renderTimer(localTimer);
-  
-  if(settings.timer_running) startLocalTimerLoop();
-  
-  // Sort
-  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
-  const sortMap = {desc:0,asc:1,manual:2};
-  const allSortBtns = document.querySelectorAll('#sort-selector .sort-btn');
-  if(allSortBtns[sortMap[settings.sort_order]]) allSortBtns[sortMap[settings.sort_order]].classList.add('active');
-  
-  // Status badge
-  const badge = document.getElementById('vote-status-badge');
-  if(settings.is_active) {
-    badge.textContent = '투표 활성';
-    badge.className = 'badge badge-active';
-  } else {
-    badge.textContent = '투표 비활성';
-    badge.className = 'badge badge-inactive';
+  if(!timerInterval) {
+    localTimer = settings.timer_remaining ?? settings.timer_seconds ?? 60;
+    renderTimer(localTimer);
   }
-  
+  if(settings.timer_running && !timerInterval) startLocalTimerLoop();
+
+  // Status
+  updateStatusBadge();
+
+  // Sort
+  updateSortUI(settings.sort_order || 'manual');
+
+  // Free mode
+  const freeVotes = settings.free_votes_per_user;
+  if(freeVotes === 0) currentFreeMode = 'unlimited'; // disabled
+  else if(freeVotes >= 9999) currentFreeMode = 'free';
+  else currentFreeMode = 'limited';
+  setVal('free-count-input', freeVotes || 3);
+  setEl('free-count-display', freeVotes || 3);
+  renderFreeOptions();
+
   updatePreview();
+}
+
+function setVal(id, v) { const el = document.getElementById(id); if(el && v !== undefined) el.value = v; }
+function setEl(id, v) { const el = document.getElementById(id); if(el) el.textContent = v; }
+function setCheck(id, v) { const el = document.getElementById(id); if(el) el.checked = v; }
+function setColorPair(colorId, textId, val) {
+  const c = document.getElementById(colorId), t = document.getElementById(textId);
+  if(c) c.value = val; if(t) t.value = val;
+}
+function syncColor(src, dst) {
+  const s = document.getElementById(src), d = document.getElementById(dst);
+  if(s && d) d.value = s.value;
 }
 
 async function autoSaveSetting(key, value) {
   settings[key] = value;
-  await db.from('vote_settings').update({[key]:value,updated_at:new Date().toISOString()}).eq('id','00000000-0000-0000-0000-000000000001');
+  await db.from('vote_settings').update({[key]: value, updated_at: new Date().toISOString()}).eq('id','00000000-0000-0000-0000-000000000001');
 }
 
 async function saveSettings() {
   const upd = {
     title: document.getElementById('s-title').value,
     subtitle: document.getElementById('s-subtitle').value,
-    free_votes_per_user: parseInt(document.getElementById('s-free-votes').value),
-    timer_seconds: parseInt(document.getElementById('s-timer').value),
-    show_numbers: document.getElementById('s-show-numbers').checked,
     updated_at: new Date().toISOString()
   };
   await db.from('vote_settings').update(upd).eq('id','00000000-0000-0000-0000-000000000001');
   Object.assign(settings, upd);
-  toast('설정 저장됨');
+  toast('설정 저장됨', 'success');
 }
 
-// VOTE ACTIVE
+// ── VOTE ACTIVE ─────────────────────────
 async function toggleVoteActive(val) {
   await autoSaveSetting('is_active', val);
   settings.is_active = val;
-  applySettings();
-  toast(val ? '▶ 투표 시작됨' : '■ 투표 종료됨', val ? 'success' : 'error');
+  updateStatusBadge();
+  toast(val ? '▶ 투표 시작됨' : '■ 투표 종료됨', val ? 'success' : 'default');
 }
 
-// TIMER
+function updateStatusBadge() {
+  const b = document.getElementById('vote-status-badge');
+  const btnStart = document.getElementById('btn-start');
+  const btnStop = document.getElementById('btn-stop');
+  if(settings.is_active) {
+    b.textContent = '활성 중'; b.className = 'badge badge-green';
+    if(btnStart) btnStart.style.display = 'none';
+    if(btnStop) btnStop.style.display = '';
+  } else {
+    b.textContent = '비활성'; b.className = 'badge badge-gray';
+    if(btnStart) btnStart.style.display = '';
+    if(btnStop) btnStop.style.display = 'none';
+  }
+}
+
+// ── TIMER ───────────────────────────────
 function renderTimer(secs) {
-  const m = Math.floor(secs / 60);
-  const s = secs % 60;
-  document.getElementById('timer-min').textContent = String(m).padStart(2,'0');
-  document.getElementById('timer-sec').textContent = String(s).padStart(2,'0');
-  const isActive = settings.timer_running;
-  document.getElementById('timer-min').classList.toggle('active', isActive);
-  document.getElementById('timer-sec').classList.toggle('active', isActive);
+  const m = Math.floor(secs/60), s = secs%60;
+  const minEls = document.querySelectorAll('#dash-timer-min');
+  const secEls = document.querySelectorAll('#dash-timer-sec');
+  minEls.forEach(el => el.textContent = String(m).padStart(2,'0'));
+  secEls.forEach(el => el.textContent = String(s).padStart(2,'0'));
+
+  const boxes = document.querySelectorAll('.timer-box');
+  boxes.forEach(b => {
+    b.classList.remove('running','warning','urgent');
+    if(secs <= 10) b.classList.add('urgent');
+    else if(secs <= 30) b.classList.add('warning');
+    else if(settings.timer_running) b.classList.add('running');
+  });
 }
 
 async function startTimer() {
+  clearInterval(timerInterval); timerInterval = null;
   await db.from('vote_settings').update({timer_running:true,timer_remaining:localTimer,updated_at:new Date().toISOString()}).eq('id','00000000-0000-0000-0000-000000000001');
   settings.timer_running = true;
   startLocalTimerLoop();
-  toast('타이머 시작');
+  toast('⏱ 타이머 시작');
 }
 
 async function pauseTimer() {
-  clearInterval(timerInterval);
+  clearInterval(timerInterval); timerInterval = null;
   await db.from('vote_settings').update({timer_running:false,timer_remaining:localTimer,updated_at:new Date().toISOString()}).eq('id','00000000-0000-0000-0000-000000000001');
   settings.timer_running = false;
   renderTimer(localTimer);
-  toast('타이머 정지');
+  toast('⏸ 타이머 정지');
 }
 
 async function resetTimer() {
-  clearInterval(timerInterval);
-  const dur = settings.timer_seconds || 60;
+  clearInterval(timerInterval); timerInterval = null;
+  const dur = parseInt(document.getElementById('timer-set-input').value) || 60;
   localTimer = dur;
   await db.from('vote_settings').update({timer_running:false,timer_remaining:dur,updated_at:new Date().toISOString()}).eq('id','00000000-0000-0000-0000-000000000001');
   settings.timer_running = false;
   renderTimer(localTimer);
-  toast('타이머 초기화');
-}
-
-function startLocalTimerLoop() {
-  clearInterval(timerInterval);
-  timerInterval = setInterval(async () => {
-    if(localTimer > 0) {
-      localTimer--;
-      renderTimer(localTimer);
-      // sync every 5s
-      if(localTimer % 5 === 0) {
-        await db.from('vote_settings').update({timer_remaining:localTimer,updated_at:new Date().toISOString()}).eq('id','00000000-0000-0000-0000-000000000001');
-      }
-    } else {
-      clearInterval(timerInterval);
-      await db.from('vote_settings').update({timer_running:false,timer_remaining:0,updated_at:new Date().toISOString()}).eq('id','00000000-0000-0000-0000-000000000001');
-      settings.timer_running = false;
-      toast('타이머 종료!','error');
-    }
-  }, 1000);
+  toast('↩ 타이머 초기화');
 }
 
 async function setTimerDuration() {
@@ -954,163 +1162,119 @@ async function setTimerDuration() {
   renderTimer(val);
 }
 
-// RESET VOTES
-async function resetAllVotes() {
-  if(!confirm('모든 항목의 투표수를 초기화하시겠습니까?')) return;
-  await db.from('vote_items').update({vote_count:0,paid_votes:0}).neq('id','00000000-0000-0000-0000-000000000000');
-  await db.from('vote_records').delete().neq('id','00000000-0000-0000-0000-000000000000');
-  await db.from('free_vote_usage').delete().neq('id','00000000-0000-0000-0000-000000000000');
-  toast('투표수 초기화됨');
-  loadItems();
+function startLocalTimerLoop() {
+  clearInterval(timerInterval);
+  timerInterval = setInterval(async () => {
+    if(localTimer > 0) {
+      localTimer--;
+      renderTimer(localTimer);
+      if(localTimer % 5 === 0) {
+        await db.from('vote_settings').update({timer_remaining:localTimer,updated_at:new Date().toISOString()}).eq('id','00000000-0000-0000-0000-000000000001');
+      }
+    } else {
+      clearInterval(timerInterval); timerInterval = null;
+      await db.from('vote_settings').update({timer_running:false,timer_remaining:0,updated_at:new Date().toISOString()}).eq('id','00000000-0000-0000-0000-000000000001');
+      settings.timer_running = false;
+      toast('⏱ 타이머 종료!', 'error');
+    }
+  }, 1000);
 }
 
-// ITEMS
+async function toggleTimerVisible(val) {
+  setCheck('d-timer-visible', val);
+  setCheck('dash-timer-visible', val);
+  await autoSaveSetting('timer_visible', val);
+  toast(val ? '⏱ 타이머 표시됨' : '⏱ 타이머 숨겨짐');
+}
+
+// ── ITEMS ────────────────────────────────
 async function loadItems() {
   const { data } = await db.from('vote_items').select('*').order('sort_position');
-  if(data) {
-    items = data;
-    renderItems();
-    renderDashboardStats();
-    renderTopItems();
-  }
+  if(data) { items = data; renderItems(); renderDashStats(); renderTopItems(); updatePreview(); }
 }
 
 function getSortedItems() {
-  const sorted = [...items];
-  if(settings.sort_order === 'desc') sorted.sort((a,b) => b.vote_count - a.vote_count);
-  else if(settings.sort_order === 'asc') sorted.sort((a,b) => a.vote_count - b.vote_count);
-  else sorted.sort((a,b) => a.sort_position - b.sort_position);
-  return sorted;
+  const s = [...items];
+  if(settings.sort_order === 'desc') s.sort((a,b) => b.vote_count - a.vote_count);
+  else if(settings.sort_order === 'asc') s.sort((a,b) => a.vote_count - b.vote_count);
+  else s.sort((a,b) => a.sort_position - b.sort_position);
+  return s;
 }
 
 function renderItems() {
   const tbody = document.getElementById('items-tbody');
   const sorted = getSortedItems();
+  const total = sorted.reduce((a,b)=>a+b.vote_count,0);
+
   if(!sorted.length) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text2);padding:40px">항목이 없습니다.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text2);padding:40px">항목이 없습니다. 위 버튼으로 추가하세요.</td></tr>';
     return;
   }
-  const total = sorted.reduce((a,b) => a + b.vote_count, 0);
-  tbody.innerHTML = sorted.map((item, idx) => {
-    const pct = total > 0 ? Math.round(item.vote_count / total * 100) : 0;
-    return `
-    <tr draggable="true" data-id="${item.id}" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="drop(event)" ondragleave="dragLeave(event)">
-      <td><span class="drag-handle" title="드래그해서 순서 변경">⠿</span></td>
-      <td><div class="rank-num">${idx+1}</div></td>
+
+  tbody.innerHTML = sorted.map((item,idx) => {
+    const pct = total > 0 ? Math.round(item.vote_count/total*100) : 0;
+    return `<tr draggable="true" data-id="${item.id}" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="drop(event)" ondragleave="dragLeave(event)">
+      <td><span class="drag-handle" title="드래그로 순서 변경">⠿</span></td>
+      <td><div class="rank-chip">${idx+1}</div></td>
       <td>
         <div style="font-weight:600">${item.label}</div>
-        ${item.description ? `<div style="font-size:12px;color:var(--text2)">${item.description}</div>` : ''}
+        ${item.description?`<div class="text-sm text-muted">${item.description}</div>`:''}
       </td>
       <td>
-        <div style="display:flex;align-items:center;gap:6px;">
-          <div style="width:20px;height:20px;border-radius:6px;background:${item.color};border:1px solid rgba(255,255,255,0.2)"></div>
-          <span style="font-size:12px;color:var(--text2)">${item.color}</span>
+        <div class="flex items-center gap-8">
+          <div class="swatch" style="background:${item.color}"></div>
+          <span class="text-sm text-muted">${item.color}</span>
         </div>
       </td>
       <td>
-        <div class="vote-bar-wrap">
-          <div class="vote-bar-bg"><div class="vote-bar-fill" style="width:${pct}%;background:${item.color}"></div></div>
-          <span class="item-vote-display" style="color:${item.color}">${item.vote_count}</span>
-          <span style="font-size:11px;color:var(--text2)">${pct}%</span>
+        <div class="vbar-wrap">
+          <div class="vbar-bg"><div class="vbar-fill" style="width:${pct}%;background:${item.color}"></div></div>
+          <span style="font-weight:700;color:${item.color};min-width:30px;text-align:right">${item.vote_count}</span>
+          <span class="text-sm text-muted">${pct}%</span>
         </div>
       </td>
       <td>
-        <div style="display:flex;align-items:center;gap:4px;">
-          <button class="btn btn-ghost btn-sm" onclick="adjustVote('${item.id}', -10)">-10</button>
-          <button class="btn btn-ghost btn-sm" onclick="adjustVote('${item.id}', -1)">-1</button>
-          <button class="btn btn-primary btn-sm" onclick="adjustVote('${item.id}', 1)">+1</button>
-          <button class="btn btn-primary btn-sm" onclick="adjustVote('${item.id}', 10)">+10</button>
+        <div class="flex items-center gap-4">
+          <input class="adj-input" type="text" id="adj-${item.id}" placeholder="+5 / -3 / =20" title="예: +15, -10, =50">
+          <button class="btn btn-default btn-sm" onclick="applyAdjust('${item.id}')">적용</button>
         </div>
       </td>
       <td>
-        <div style="display:flex;gap:4px;">
-          <button class="btn btn-ghost btn-sm" onclick="editItem('${item.id}')">✏️</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteItem('${item.id}')">🗑</button>
+        <div class="flex gap-4">
+          <button class="btn btn-ghost btn-sm btn-icon" onclick="openEditModal('${item.id}')" title="수정">✏️</button>
+          <button class="btn btn-ghost btn-sm btn-icon" onclick="deleteItem('${item.id}')" title="삭제">🗑</button>
         </div>
       </td>
     </tr>`;
   }).join('');
 }
 
-function renderDashboardStats() {
-  const total = items.reduce((a,b) => a+b.vote_count, 0);
-  const paid = items.reduce((a,b) => a+(b.paid_votes||0), 0);
-  document.getElementById('stat-total').textContent = total;
-  document.getElementById('stat-free').textContent = total - paid;
-  document.getElementById('stat-paid').textContent = paid;
-  document.getElementById('stat-items').textContent = items.length;
-}
-
-function renderTopItems() {
-  const sorted = [...items].sort((a,b) => b.vote_count - a.vote_count).slice(0,5);
-  const total = items.reduce((a,b) => a+b.vote_count, 0);
-  const container = document.getElementById('dashboard-top-items');
-  if(!sorted.length) { container.innerHTML = '<div class="text-muted text-sm">항목 없음</div>'; return; }
-  container.innerHTML = sorted.map((item, i) => {
-    const pct = total > 0 ? Math.round(item.vote_count/total*100) : 0;
-    return `<div style="display:flex;align-items:center;gap:10px;">
-      <div style="width:24px;height:24px;border-radius:8px;background:${item.color};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white">${i+1}</div>
-      <div style="flex:1">
-        <div style="font-size:13px;font-weight:600;margin-bottom:3px">${item.label}</div>
-        <div class="vote-bar-bg"><div class="vote-bar-fill" style="width:${pct}%;background:${item.color}"></div></div>
-      </div>
-      <span style="font-weight:700;color:${item.color};min-width:30px;text-align:right">${item.vote_count}</span>
-    </div>`;
-  }).join('');
-}
-
-async function adjustVote(id, delta) {
+async function applyAdjust(id) {
+  const input = document.getElementById('adj-'+id);
+  const raw = (input.value || '').trim();
+  if(!raw) return;
   const item = items.find(i => i.id === id);
   if(!item) return;
-  const newCount = Math.max(0, item.vote_count + delta);
+
+  let newCount = item.vote_count;
+  if(raw.startsWith('=')) {
+    newCount = parseInt(raw.slice(1)) || 0;
+  } else if(raw.startsWith('+')) {
+    newCount += parseInt(raw.slice(1)) || 0;
+  } else if(raw.startsWith('-')) {
+    newCount -= parseInt(raw.slice(1)) || 0;
+  } else {
+    newCount += parseInt(raw) || 0;
+  }
+  newCount = Math.max(0, newCount);
+
   await db.from('vote_items').update({vote_count:newCount,updated_at:new Date().toISOString()}).eq('id',id);
   item.vote_count = newCount;
+  input.value = '';
   renderItems();
-  renderDashboardStats();
+  renderDashStats();
   renderTopItems();
-}
-
-// MODAL
-function showAddItemModal() {
-  editingItemId = null;
-  document.getElementById('modal-title').textContent = '항목 추가';
-  document.getElementById('modal-label').value = '';
-  document.getElementById('modal-desc').value = '';
-  document.getElementById('modal-color').value = '#7C3AED';
-  document.getElementById('modal-color-text').value = '#7C3AED';
-  document.getElementById('modal-bg').style.display = 'block';
-}
-
-function editItem(id) {
-  const item = items.find(i => i.id === id);
-  if(!item) return;
-  editingItemId = id;
-  document.getElementById('modal-title').textContent = '항목 수정';
-  document.getElementById('modal-label').value = item.label;
-  document.getElementById('modal-desc').value = item.description || '';
-  document.getElementById('modal-color').value = item.color || '#7C3AED';
-  document.getElementById('modal-color-text').value = item.color || '#7C3AED';
-  document.getElementById('modal-bg').style.display = 'block';
-}
-
-function closeModal() { document.getElementById('modal-bg').style.display = 'none'; }
-
-async function saveItem() {
-  const label = document.getElementById('modal-label').value.trim();
-  if(!label) { toast('항목명을 입력하세요','error'); return; }
-  const color = document.getElementById('modal-color').value;
-  const description = document.getElementById('modal-desc').value.trim();
-  
-  if(editingItemId) {
-    await db.from('vote_items').update({label,description,color,updated_at:new Date().toISOString()}).eq('id',editingItemId);
-    toast('항목 수정됨');
-  } else {
-    const maxPos = items.length > 0 ? Math.max(...items.map(i=>i.sort_position)) + 1 : 0;
-    await db.from('vote_items').insert({label,description,color,sort_position:maxPos});
-    toast('항목 추가됨');
-  }
-  closeModal();
-  loadItems();
+  toast(`✅ ${item.label}: ${newCount}표`, 'success');
 }
 
 async function deleteItem(id) {
@@ -1120,136 +1284,255 @@ async function deleteItem(id) {
   loadItems();
 }
 
-// SORT
+// ── MODAL ─────────────────────────────
+function openAddModal() {
+  editingItemId = null;
+  document.getElementById('item-modal-title').textContent = '항목 추가';
+  document.getElementById('modal-label').value = '';
+  document.getElementById('modal-desc').value = '';
+  setModalColor('#2F80ED');
+  document.getElementById('item-modal').classList.add('open');
+  setTimeout(() => document.getElementById('modal-label').focus(), 50);
+}
+
+function openEditModal(id) {
+  const item = items.find(i => i.id === id);
+  if(!item) return;
+  editingItemId = id;
+  document.getElementById('item-modal-title').textContent = '항목 수정';
+  document.getElementById('modal-label').value = item.label;
+  document.getElementById('modal-desc').value = item.description || '';
+  setModalColor(item.color || '#2F80ED');
+  document.getElementById('item-modal').classList.add('open');
+  setTimeout(() => document.getElementById('modal-label').focus(), 50);
+}
+
+function closeItemModal() { document.getElementById('item-modal').classList.remove('open'); }
+
+function setModalColor(c) {
+  document.getElementById('modal-color').value = c;
+  document.getElementById('modal-color-text').value = c;
+}
+
+async function saveItem() {
+  const label = document.getElementById('modal-label').value.trim();
+  if(!label) { toast('항목명을 입력하세요', 'error'); return; }
+  const color = document.getElementById('modal-color').value;
+  const description = document.getElementById('modal-desc').value.trim();
+
+  if(editingItemId) {
+    await db.from('vote_items').update({label,description,color,updated_at:new Date().toISOString()}).eq('id',editingItemId);
+    toast('항목 수정됨', 'success');
+  } else {
+    const maxPos = items.length > 0 ? Math.max(...items.map(i=>i.sort_position))+1 : 0;
+    await db.from('vote_items').insert({label,description,color,sort_position:maxPos});
+    toast('항목 추가됨', 'success');
+  }
+  closeItemModal();
+  // loadItems() called via realtime
+}
+
+// ── SORT ────────────────────────────────
 async function setSortOrder(order) {
   settings.sort_order = order;
   await autoSaveSetting('sort_order', order);
-  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
-  const allBtns = document.querySelectorAll('#sort-selector .sort-btn');
-  const orderMap = {desc:0,asc:1,manual:2};
-  if(allBtns[orderMap[order]]) allBtns[orderMap[order]].classList.add('active');
+  updateSortUI(order);
   renderItems();
 }
 
-// DRAG & DROP
-let dragSrcId = null;
-function dragStart(e) { dragSrcId = e.currentTarget.dataset.id; e.currentTarget.classList.add('dragging'); }
-function dragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
-function dragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+function updateSortUI(order) {
+  // Chips in items page
+  document.querySelectorAll('.sort-chip').forEach(b => b.classList.remove('active'));
+  const chipMap = {desc:0, asc:1, manual:2};
+  const chips = document.querySelectorAll('#sort-chips .sort-chip');
+  if(chips[chipMap[order]]) chips[chipMap[order]].classList.add('active');
+  // Options in settings
+  ['desc','asc','manual'].forEach(o => {
+    const el = document.getElementById('sort-'+o+'-opt');
+    if(el) el.classList.toggle('selected', o === order);
+  });
+}
+
+// ── DRAG & DROP ─────────────────────────
+let dragId = null;
+function dragStart(e) { dragId = e.currentTarget.dataset.id; e.currentTarget.classList.add('dragging-row'); }
+function dragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over-row'); }
+function dragLeave(e) { e.currentTarget.classList.remove('drag-over-row'); }
 async function drop(e) {
   e.preventDefault();
-  const targetId = e.currentTarget.dataset.id;
-  e.currentTarget.classList.remove('drag-over');
-  document.querySelectorAll('.dragging').forEach(el => el.classList.remove('dragging'));
-  if(dragSrcId === targetId) return;
-  
-  const srcIdx = items.findIndex(i => i.id === dragSrcId);
-  const tgtIdx = items.findIndex(i => i.id === targetId);
+  const tgtId = e.currentTarget.dataset.id;
+  e.currentTarget.classList.remove('drag-over-row');
+  document.querySelectorAll('.dragging-row').forEach(el => el.classList.remove('dragging-row'));
+  if(dragId === tgtId) return;
   const sorted = getSortedItems();
-  const srcSortedIdx = sorted.findIndex(i => i.id === dragSrcId);
-  const tgtSortedIdx = sorted.findIndex(i => i.id === targetId);
-  sorted.splice(tgtSortedIdx, 0, sorted.splice(srcSortedIdx, 1)[0]);
-  
+  const si = sorted.findIndex(i=>i.id===dragId), ti = sorted.findIndex(i=>i.id===tgtId);
+  sorted.splice(ti,0,sorted.splice(si,1)[0]);
   for(let i=0;i<sorted.length;i++) {
     await db.from('vote_items').update({sort_position:i}).eq('id',sorted[i].id);
     sorted[i].sort_position = i;
   }
   items = sorted;
-  if(settings.sort_order !== 'manual') { settings.sort_order = 'manual'; await autoSaveSetting('sort_order','manual'); }
+  if(settings.sort_order !== 'manual') { settings.sort_order='manual'; await autoSaveSetting('sort_order','manual'); }
   renderItems();
 }
 
-// PAID REQUESTS
-async function loadPaidRequests() {
-  const { data } = await db.from('paid_vote_requests').select('*, vote_items(label)').order('created_at', {ascending:false});
-  const tbody = document.getElementById('paid-tbody');
-  if(!data || !data.length) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text2);padding:40px">유료 투표 요청 없음</td></tr>';
-    return;
-  }
-  tbody.innerHTML = data.map(r => `
-    <tr>
-      <td style="color:var(--text2);font-size:12px">${new Date(r.created_at).toLocaleString('ko-KR')}</td>
-      <td style="font-weight:600">${r.voter_name}</td>
-      <td>${r.vote_items?.label || '—'}</td>
-      <td><span class="tag">+${r.amount}표</span></td>
-      <td style="color:var(--text2)">${r.payment_proof || '—'}</td>
-      <td><span class="badge badge-${r.status}">${{pending:'대기중',approved:'승인됨',rejected:'거절됨'}[r.status]}</span></td>
-      <td>
-        ${r.status==='pending' ? `
-        <div style="display:flex;gap:4px;">
-          <button class="btn btn-success btn-sm" onclick="approvePaid('${r.id}')">✓ 승인</button>
-          <button class="btn btn-danger btn-sm" onclick="rejectPaid('${r.id}')">✗ 거절</button>
-        </div>` : '—'}
-      </td>
-    </tr>`).join('');
+// ── RESET ───────────────────────────────
+function openResetModal() { document.getElementById('reset-modal').classList.add('open'); }
+function closeResetModal() { document.getElementById('reset-modal').classList.remove('open'); }
+
+async function doReset() {
+  closeResetModal();
+  await db.from('vote_items').update({vote_count:0,paid_votes:0,updated_at:new Date().toISOString()}).neq('id','00000000-0000-0000-0000-000000000000');
+  await db.from('vote_records').delete().neq('id','00000000-0000-0000-0000-000000000000');
+  await db.from('free_vote_usage').delete().neq('id','00000000-0000-0000-0000-000000000000');
+  toast('🗑 초기화 완료', 'success');
+  loadItems();
 }
 
-async function approvePaid(id) {
-  const { data } = await db.rpc('approve_paid_vote', {p_request_id: id});
-  if(data?.success) { toast('✓ 유료 투표 승인됨', 'success'); loadPaidRequests(); loadItems(); }
-  else toast(data?.message || '오류 발생', 'error');
+// ── FREE SETTINGS ────────────────────────
+function selectFreeMode(mode) {
+  currentFreeMode = mode;
+  renderFreeOptions();
 }
 
-async function rejectPaid(id) {
-  await db.from('paid_vote_requests').update({status:'rejected',updated_at:new Date().toISOString()}).eq('id',id);
-  toast('거절됨'); loadPaidRequests();
+function renderFreeOptions() {
+  const modes = ['unlimited','limited','free'];
+  modes.forEach(m => {
+    const el = document.querySelector(`[onclick="selectFreeMode('${m}')"]`);
+    if(el) el.classList.toggle('selected', currentFreeMode === m);
+  });
+  const countGroup = document.getElementById('free-count-group');
+  if(countGroup) countGroup.style.display = currentFreeMode === 'limited' ? 'block' : 'none';
 }
 
-// PREVIEW
+async function saveFreeSettings() {
+  let val;
+  if(currentFreeMode === 'unlimited') val = 0;
+  else if(currentFreeMode === 'free') val = 9999;
+  else val = parseInt(document.getElementById('free-count-input').value) || 3;
+  await autoSaveSetting('free_votes_per_user', val);
+  setEl('free-count-display', val);
+  toast('무료 투표 설정 저장됨', 'success');
+}
+
+async function renderFreeStats() {
+  const { data } = await db.from('free_vote_usage').select('*');
+  const list = document.getElementById('free-stats-list');
+  if(!data || !data.length) { list.innerHTML = '<div class="text-sm text-muted">투표 기록 없음</div>'; return; }
+  const grouped = {};
+  data.forEach(r => { grouped[r.item_id] = (grouped[r.item_id] || 0) + r.votes_used; });
+  const total = data.reduce((a,b) => a + b.votes_used, 0);
+  setEl('free-total-count', total);
+
+  list.innerHTML = Object.entries(grouped).map(([itemId, cnt]) => {
+    const item = items.find(i => i.id === itemId);
+    const label = item ? item.label : itemId.slice(0,8)+'...';
+    return `<div class="flex items-center justify-between" style="padding:6px 0;border-bottom:1px solid var(--border)">
+      <div class="flex items-center gap-8">
+        ${item?`<div class="swatch" style="background:${item.color}"></div>`:''}
+        <span class="font-600">${label}</span>
+      </div>
+      <span class="badge badge-blue">${cnt}표</span>
+    </div>`;
+  }).join('');
+  setEl('free-total-count', total);
+}
+
+// ── DASHBOARD STATS ──────────────────────
+function renderDashStats() {
+  const total = items.reduce((a,b)=>a+b.vote_count,0);
+  const paid = items.reduce((a,b)=>a+(b.paid_votes||0),0);
+  setEl('stat-total', total);
+  setEl('stat-free', total-paid);
+  setEl('stat-paid', paid);
+  setEl('stat-items', items.length);
+}
+
+function renderTopItems() {
+  const sorted = [...items].sort((a,b)=>b.vote_count-a.vote_count).slice(0,5);
+  const total = items.reduce((a,b)=>a+b.vote_count,0);
+  const el = document.getElementById('dash-top-items');
+  if(!sorted.length) { el.innerHTML = '<div class="text-sm text-muted">항목 없음</div>'; return; }
+  el.innerHTML = sorted.map((item,i) => {
+    const pct = total > 0 ? Math.round(item.vote_count/total*100) : 0;
+    return `<div class="flex items-center gap-12" style="padding:8px 0;border-bottom:1px solid var(--border)">
+      <div class="rank-chip">${i+1}</div>
+      <div style="flex:1">
+        <div class="flex justify-between mb-4">
+          <span class="font-600">${item.label}</span>
+          <span style="font-weight:700;color:${item.color}">${item.vote_count}표</span>
+        </div>
+        <div class="vbar-bg"><div class="vbar-fill" style="width:${pct}%;background:${item.color}"></div></div>
+      </div>
+      <span class="text-sm text-muted">${pct}%</span>
+    </div>`;
+  }).join('');
+}
+
+// ── PREVIEW ──────────────────────────────
 function updatePreview() {
   const t = document.getElementById('d-title')?.value || settings.title || '라이브 투표';
-  const s = document.getElementById('d-subtitle')?.value || settings.subtitle || '투표하세요';
+  const s = document.getElementById('d-subtitle')?.value || settings.subtitle || '지금 바로 투표하세요!';
   const tc = document.getElementById('d-title-color')?.value || settings.title_color || '#FFFFFF';
   const sc = document.getElementById('d-subtitle-color')?.value || settings.subtitle_color || '#A78BFA';
   const ts = document.getElementById('d-title-size')?.value || settings.title_size || 48;
   const ss = document.getElementById('d-subtitle-size')?.value || settings.subtitle_size || 24;
+  const bg = document.getElementById('d-bg-color')?.value || settings.bg_color || '#0B0B15';
+
+  const box = document.getElementById('preview-box');
   const pt = document.getElementById('preview-title');
-  const ps = document.getElementById('preview-subtitle');
-  if(pt) { pt.textContent = t; pt.style.color = tc; pt.style.fontSize = Math.min(parseInt(ts)/2, 32)+'px'; }
-  if(ps) { ps.textContent = s; ps.style.color = sc; ps.style.fontSize = Math.min(parseInt(ss)/2, 18)+'px'; }
-  
+  const ps = document.getElementById('preview-sub');
   const pi = document.getElementById('preview-items');
+
+  if(box) box.style.background = bg;
+  if(pt) { pt.textContent = t; pt.style.color = tc; pt.style.fontSize = Math.min(parseInt(ts)/2.2, 30)+'px'; }
+  if(ps) { ps.textContent = s; ps.style.color = sc; ps.style.fontSize = Math.min(parseInt(ss)/2, 14)+'px'; }
+
   if(pi && items.length) {
     const total = items.reduce((a,b)=>a+b.vote_count,0);
     const sorted = getSortedItems().slice(0,4);
     pi.innerHTML = sorted.map((item,i) => {
-      const pct = total > 0 ? Math.round(item.vote_count/total*100) : 0;
-      return `<div style="display:flex;align-items:center;gap:6px;font-size:10px;">
-        <span style="color:${item.color};font-weight:700">${i+1}.</span>
-        <span>${item.label}</span>
-        <div style="flex:1;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden"><div style="width:${pct}%;height:100%;background:${item.color}"></div></div>
-        <span style="color:${item.color}">${item.vote_count}</span>
+      const pct = total>0?Math.round(item.vote_count/total*100):0;
+      return `<div class="preview-item">
+        <span style="color:${item.color};font-weight:700;min-width:14px">${i+1}.</span>
+        <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${item.label}</span>
+        <div class="preview-bar-bg"><div class="preview-bar-fill" style="width:${pct}%;background:${item.color}"></div></div>
+        <span style="color:${item.color};font-weight:700;min-width:24px;text-align:right">${item.vote_count}</span>
       </div>`;
     }).join('');
   }
 }
 
-// REALTIME
+function setBg(color) {
+  document.getElementById('d-bg-color').value = color;
+  document.getElementById('d-bg-color-text').value = color;
+  autoSaveSetting('bg_color', color);
+  updatePreview();
+}
+
+// ── REALTIME ──────────────────────────────
 function setupRealtime() {
-  db.channel('admin-realtime')
+  db.channel('admin-rt')
     .on('postgres_changes', {event:'*',schema:'public',table:'vote_items'}, () => loadItems())
     .on('postgres_changes', {event:'*',schema:'public',table:'vote_settings'}, payload => {
-      // Don't overwrite local timer if we're running it
-      const newData = payload.new;
+      const nd = payload.new;
+      // Only update timer display if not currently running locally
       if(!settings.timer_running) {
-        localTimer = newData.timer_remaining ?? localTimer;
+        localTimer = nd.timer_remaining ?? localTimer;
         renderTimer(localTimer);
       }
-    })
-    .on('postgres_changes', {event:'INSERT',schema:'public',table:'paid_vote_requests'}, () => {
-      toast('💰 새 유료 투표 요청!', 'success');
+      settings = {...settings, ...nd};
+      updateStatusBadge();
     })
     .subscribe();
 }
 
-// INIT
+// ── INIT ──────────────────────────────────
 async function init() {
   await loadSettings();
   await loadItems();
   setupRealtime();
 }
-
 init();
 </script>
 </body>
