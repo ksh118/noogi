@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>관리자 대시보드 — 라이브 투표</title>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0A0A0F;
+  --bg2: #12121A;
+  --bg3: #1A1A26;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.15);
+  --text: #F0F0FF;
+  --text2: #8888AA;
+  --accent: #7C3AED;
+  --accent2: #A855F7;
+  --green: #10B981;
+  --red: #EF4444;
+  --yellow: #F59E0B;
+  --blue: #3B82F6;
+  --glow: 0 0 20px rgba(124,58,237,0.3);
+}
+
+body {
+  font-family: 'Pretendard', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 220px;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 100;
+}
+
+.sidebar-logo {
+  padding: 24px 20px;
+  border-bottom: 1px solid var(--border);
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.sidebar-logo span { font-size: 11px; display: block; color: var(--text2); margin-top: 2px; font-weight: 400; -webkit-text-fill-color: var(--text2); }
+
+.sidebar-nav { flex: 1; padding: 12px 0; }
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 20px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text2);
+  transition: all 0.2s;
+  border-left: 2px solid transparent;
+}
+.nav-item:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+.nav-item.active { color: var(--accent2); background: rgba(124,58,237,0.1); border-left-color: var(--accent2); }
+.nav-item .icon { font-size: 18px; width: 22px; text-align: center; }
+
+.sidebar-status {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text2);
+}
+
+.status-dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  margin-right: 6px;
+  box-shadow: 0 0 6px var(--green);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+/* MAIN */
+.main {
+  margin-left: 220px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.topbar-title { font-size: 18px; font-weight: 700; }
+.topbar-actions { display: flex; gap: 10px; align-items: center; }
+
+.btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-primary { background: var(--accent); color: white; }
+.btn-primary:hover { background: var(--accent2); box-shadow: var(--glow); }
+.btn-success { background: var(--green); color: white; }
+.btn-success:hover { background: #059669; }
+.btn-danger { background: var(--red); color: white; }
+.btn-danger:hover { background: #DC2626; }
+.btn-ghost { background: rgba(255,255,255,0.06); color: var(--text); }
+.btn-ghost:hover { background: rgba(255,255,255,0.12); }
+.btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 6px; }
+.btn-lg { padding: 12px 24px; font-size: 15px; }
+
+/* PAGE */
+.page { display: none; padding: 32px; }
+.page.active { display: block; }
+
+/* SECTION HEADER */
+.section-header { margin-bottom: 24px; }
+.section-title { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+.section-sub { font-size: 13px; color: var(--text2); }
+
+/* CARDS */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  transition: border-color 0.2s;
+}
+.card:hover { border-color: var(--border2); }
+.card-title { font-size: 13px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+
+/* GRID */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+/* STAT CARDS */
+.stat-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+}
+.stat-label { font-size: 12px; color: var(--text2); margin-bottom: 8px; font-weight: 500; }
+.stat-value { font-size: 32px; font-weight: 800; letter-spacing: -1px; }
+.stat-change { font-size: 12px; color: var(--text2); margin-top: 4px; }
+
+/* TIMER */
+.timer-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.timer-digit-group { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.timer-digit-label { font-size: 10px; color: var(--text2); font-weight: 500; letter-spacing: 0.1em; }
+.timer-box {
+  background: var(--bg3);
+  border: 2px solid var(--border2);
+  border-radius: 12px;
+  width: 56px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -1px;
+  transition: border-color 0.3s;
+}
+.timer-box.active { border-color: var(--accent2); box-shadow: 0 0 15px rgba(168,85,247,0.3); }
+.timer-sep { font-size: 24px; font-weight: 800; color: var(--text2); padding-bottom: 16px; }
+
+/* TIMER CONTROLS */
+.timer-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.timer-input-group { display: flex; align-items: center; gap: 8px; }
+.timer-input-group label { font-size: 13px; color: var(--text2); }
+.timer-input-group input {
+  width: 80px;
+  padding: 7px 12px;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  text-align: center;
+}
+.timer-input-group input:focus { outline: none; border-color: var(--accent2); }
+
+/* VOTE ITEMS TABLE */
+.items-table-wrapper { overflow: hidden; border-radius: 12px; border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; }
+thead tr { background: var(--bg3); }
+th { padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.08em; border-bottom: 1px solid var(--border); }
+td { padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 14px; vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tbody tr { transition: background 0.15s; }
+tbody tr:hover { background: rgba(255,255,255,0.02); }
+
+.drag-handle { cursor: grab; color: var(--text2); font-size: 18px; }
+.drag-handle:active { cursor: grabbing; }
+
+/* VOTE BAR */
+.vote-bar-wrap { display: flex; align-items: center; gap: 10px; }
+.vote-bar-bg { flex: 1; height: 6px; background: var(--bg3); border-radius: 3px; overflow: hidden; }
+.vote-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+
+/* PROGRESS CIRCLE */
+.progress-ring { position: relative; display: inline-flex; align-items: center; justify-content: center; }
+
+/* FORM ELEMENTS */
+.form-group { margin-bottom: 16px; }
+.form-label { font-size: 13px; font-weight: 600; color: var(--text2); margin-bottom: 6px; display: block; }
+.form-input {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+.form-input:focus { outline: none; border-color: var(--accent2); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+.color-row { display: flex; align-items: center; gap: 8px; }
+.color-row input[type="color"] {
+  width: 36px; height: 36px;
+  padding: 2px;
+  border-radius: 8px;
+  border: 1px solid var(--border2);
+  background: var(--bg3);
+  cursor: pointer;
+}
+
+/* BADGE */
+.badge {
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.badge-pending { background: rgba(245,158,11,0.2); color: var(--yellow); }
+.badge-approved { background: rgba(16,185,129,0.2); color: var(--green); }
+.badge-rejected { background: rgba(239,68,68,0.2); color: var(--red); }
+.badge-active { background: rgba(16,185,129,0.15); color: var(--green); }
+.badge-inactive { background: rgba(136,136,170,0.15); color: var(--text2); }
+
+/* TOGGLE */
+.toggle-wrap { display: flex; align-items: center; gap: 10px; }
+.toggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  cursor: pointer;
+}
+.toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  transition: all 0.3s;
+}
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 16px; height: 16px;
+  left: 3px; top: 3px;
+  background: var(--text2);
+  border-radius: 50%;
+  transition: all 0.3s;
+}
+.toggle input:checked + .toggle-slider { background: var(--accent); border-color: var(--accent); }
+.toggle input:checked + .toggle-slider::before { transform: translateX(20px); background: white; }
+
+/* SORT SELECTOR */
+.sort-selector { display: flex; gap: 8px; }
+.sort-btn {
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border2);
+  background: var(--bg3);
+  color: var(--text2);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+.sort-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+.sort-btn:hover:not(.active) { border-color: var(--accent2); color: var(--text); }
+
+/* DISPLAY PREVIEW */
+.display-preview {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--border2);
+  aspect-ratio: 16/9;
+  background: #050508;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--text2);
+}
+
+/* NOTIFICATION */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  padding: 14px 20px;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 999;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s;
+  max-width: 320px;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.success { border-color: var(--green); color: var(--green); }
+.toast.error { border-color: var(--red); color: var(--red); }
+
+/* TAG */
+.tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 6px; font-size: 12px; background: rgba(124,58,237,0.15); color: var(--accent2); }
+
+/* ITEM EDIT ROW */
+.item-edit-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.item-vote-display { min-width: 40px; text-align: right; font-weight: 700; font-size: 16px; }
+
+/* DIVIDER */
+.divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+/* DRAGGING */
+.dragging { opacity: 0.5; background: rgba(124,58,237,0.1) !important; }
+.drag-over { border-top: 2px solid var(--accent2) !important; }
+
+/* RANK NUMBER */
+.rank-num {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text2);
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+.gap-12 { gap: 12px; }
+.mt-16 { margin-top: 16px; }
+.mt-24 { margin-top: 24px; }
+.mb-16 { margin-bottom: 16px; }
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-8 { gap: 8px; }
+.gap-16 { gap: 16px; }
+.text-sm { font-size: 13px; }
+.text-xs { font-size: 12px; }
+.text-muted { color: var(--text2); }
+.font-bold { font-weight: 700; }
+.font-800 { font-weight: 800; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    🎯 라이브 투표<br>
+    <span>관리자 대시보드</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-item active" onclick="showPage('dashboard')">
+      <span class="icon">📊</span> 대시보드
+    </div>
+    <div class="nav-item" onclick="showPage('items')">
+      <span class="icon">📋</span> 투표 항목
+    </div>
+    <div class="nav-item" onclick="showPage('settings')">
+      <span class="icon">⚙️</span> 투표 설정
+    </div>
+    <div class="nav-item" onclick="showPage('paid')">
+      <span class="icon">💰</span> 유료 투표 관리
+    </div>
+    <div class="nav-item" onclick="showPage('display_settings')">
+      <span class="icon">🖥️</span> 표시 화면 설정
+    </div>
+  </nav>
+  <div class="sidebar-status">
+    <span class="status-dot"></span>Supabase 연결됨
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbar-title">대시보드</div>
+    <div class="topbar-actions">
+      <span id="vote-status-badge" class="badge badge-inactive">투표 비활성</span>
+      <button class="btn btn-ghost btn-sm" onclick="window.open('display.html','_blank')">🖥️ 표시 화면 열기</button>
+      <button class="btn btn-ghost btn-sm" onclick="window.open('vote.html','_blank')">🗳️ 투표 사이트 열기</button>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div class="section-header">
+      <div class="section-title">실시간 현황</div>
+      <div class="section-sub">모든 데이터는 실시간으로 업데이트됩니다</div>
+    </div>
+
+    <!-- QUICK CONTROLS -->
+    <div class="card mb-16">
+      <div class="card-title">⚡ 빠른 제어</div>
+      <div class="flex gap-8 flex-wrap items-center">
+        <button class="btn btn-success btn-lg" onclick="toggleVoteActive(true)">▶ 투표 시작</button>
+        <button class="btn btn-danger btn-lg" onclick="toggleVoteActive(false)">■ 투표 종료</button>
+        <div style="width:1px;height:40px;background:var(--border);margin:0 4px;"></div>
+        <button class="btn btn-primary btn-lg" id="timer-start-btn" onclick="startTimer()">⏱ 타이머 시작</button>
+        <button class="btn btn-ghost btn-lg" onclick="pauseTimer()">⏸ 타이머 정지</button>
+        <button class="btn btn-ghost btn-lg" onclick="resetTimer()">↩ 타이머 초기화</button>
+        <div style="width:1px;height:40px;background:var(--border);margin:0 4px;"></div>
+        <button class="btn btn-ghost btn-lg" onclick="resetAllVotes()">🗑 투표수 초기화</button>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="grid-4 mb-16">
+      <div class="stat-card">
+        <div class="stat-label">총 투표수</div>
+        <div class="stat-value" id="stat-total" style="color:var(--accent2)">0</div>
+        <div class="stat-change" id="stat-total-change">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">무료 투표</div>
+        <div class="stat-value" id="stat-free" style="color:var(--green)">0</div>
+        <div class="stat-change">실시간</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">유료 투표</div>
+        <div class="stat-value" id="stat-paid" style="color:var(--yellow)">0</div>
+        <div class="stat-change">승인된 항목</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">투표 항목 수</div>
+        <div class="stat-value" id="stat-items" style="color:var(--blue)">0</div>
+        <div class="stat-change">활성 항목</div>
+      </div>
+    </div>
+
+    <!-- TIMER + ITEMS -->
+    <div class="grid-2 gap-16">
+      <!-- TIMER CARD -->
+      <div class="card">
+        <div class="card-title">⏱ 타이머</div>
+        <div class="timer-container" id="timer-display">
+          <div class="timer-digit-group">
+            <div class="timer-digit-label">분</div>
+            <div class="timer-box" id="timer-min">00</div>
+          </div>
+          <div class="timer-sep">:</div>
+          <div class="timer-digit-group">
+            <div class="timer-digit-label">초</div>
+            <div class="timer-box" id="timer-sec">00</div>
+          </div>
+        </div>
+        <div class="timer-controls">
+          <div class="timer-input-group">
+            <label>설정 시간(초)</label>
+            <input type="number" id="timer-set-input" value="60" min="5" max="7200" onchange="setTimerDuration()">
+          </div>
+        </div>
+      </div>
+
+      <!-- TOP ITEMS CARD -->
+      <div class="card">
+        <div class="card-title">🏆 상위 항목</div>
+        <div id="dashboard-top-items" style="display:flex;flex-direction:column;gap:10px;">
+          <div class="text-muted text-sm">항목 없음</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ITEMS PAGE -->
+  <div class="page" id="page-items">
+    <div class="section-header flex justify-between items-center">
+      <div>
+        <div class="section-title">투표 항목 관리</div>
+        <div class="section-sub">항목을 추가하고 표수를 실시간으로 조정하세요</div>
+      </div>
+      <div class="flex gap-8">
+        <div class="sort-selector" id="sort-selector">
+          <button class="sort-btn" onclick="setSortOrder('desc')">표 많은순 ▼</button>
+          <button class="sort-btn" onclick="setSortOrder('asc')">표 적은순 ▲</button>
+          <button class="sort-btn active" onclick="setSortOrder('manual')">직접 설정 ✦</button>
+        </div>
+        <button class="btn btn-primary" onclick="showAddItemModal()">+ 항목 추가</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="items-table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:40px"></th>
+              <th style="width:40px">#</th>
+              <th>항목명</th>
+              <th>색상</th>
+              <th style="width:180px">현재 표수</th>
+              <th style="width:160px">표수 직접 조정</th>
+              <th style="width:120px">작업</th>
+            </tr>
+          </thead>
+          <tbody id="items-tbody">
+            <tr><td colspan="7" style="text-align:center;color:var(--text2);padding:40px">항목이 없습니다. 항목을 추가하세요.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS PAGE -->
+  <div class="page" id="page-settings">
+    <div class="section-header">
+      <div class="section-title">투표 설정</div>
+      <div class="section-sub">투표 세션의 기본 설정을 관리합니다</div>
+    </div>
+    <div class="grid-2 gap-16">
+      <div class="card">
+        <div class="card-title">🎯 기본 설정</div>
+        <div class="form-group">
+          <label class="form-label">투표 제목</label>
+          <input type="text" class="form-input" id="s-title" placeholder="투표 제목 입력..." oninput="autoSaveSetting('title', this.value)">
+        </div>
+        <div class="form-group">
+          <label class="form-label">부제목</label>
+          <input type="text" class="form-input" id="s-subtitle" placeholder="부제목 입력..." oninput="autoSaveSetting('subtitle', this.value)">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">무료 투표 횟수/인</label>
+            <input type="number" class="form-input" id="s-free-votes" min="1" max="100" value="3" onchange="autoSaveSetting('free_votes_per_user', this.value)">
+          </div>
+          <div class="form-group">
+            <label class="form-label">기본 타이머 시간(초)</label>
+            <input type="number" class="form-input" id="s-timer" min="5" max="7200" value="60" onchange="autoSaveSetting('timer_seconds', this.value)">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">항목 번호 표시</label>
+          <div class="toggle-wrap">
+            <label class="toggle"><input type="checkbox" id="s-show-numbers" checked onchange="autoSaveSetting('show_numbers', this.checked)"><span class="toggle-slider"></span></label>
+            <span class="text-sm text-muted">투표 화면에 항목 번호 표시</span>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="saveSettings()">설정 저장</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📋 정렬 순서</div>
+        <div class="form-group">
+          <label class="form-label">투표 항목 정렬</label>
+          <div class="sort-selector flex-col gap-8" style="flex-direction:column;">
+            <button class="sort-btn" id="sort-desc-btn" onclick="setSortOrder('desc')">📉 표 많은순</button>
+            <button class="sort-btn" id="sort-asc-btn" onclick="setSortOrder('asc')">📈 표 적은순</button>
+            <button class="sort-btn active" id="sort-manual-btn" onclick="setSortOrder('manual')">✦ 직접 설정 (드래그)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAID VOTES -->
+  <div class="page" id="page-paid">
+    <div class="section-header flex justify-between items-center">
+      <div>
+        <div class="section-title">유료 투표 관리</div>
+        <div class="section-sub">송금 확인 후 투표를 승인하세요</div>
+      </div>
+      <button class="btn btn-ghost" onclick="loadPaidRequests()">↻ 새로고침</button>
+    </div>
+
+    <div class="card">
+      <div class="items-table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>시간</th>
+              <th>이름</th>
+              <th>항목</th>
+              <th>표수</th>
+              <th>입금 메모</th>
+              <th>상태</th>
+              <th>작업</th>
+            </tr>
+          </thead>
+          <tbody id="paid-tbody">
+            <tr><td colspan="7" style="text-align:center;color:var(--text2);padding:40px">유료 투표 요청 없음</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- DISPLAY SETTINGS -->
+  <div class="page" id="page-display_settings">
+    <div class="section-header">
+      <div class="section-title">표시 화면 설정</div>
+      <div class="section-sub">유튜브 라이브에 표시되는 화면을 커스터마이즈하세요 — 변경사항은 실시간으로 적용됩니다</div>
+    </div>
+
+    <div class="grid-2 gap-16">
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="card">
+          <div class="card-title">📝 텍스트 설정</div>
+          <div class="form-group">
+            <label class="form-label">제목 텍스트</label>
+            <input type="text" class="form-input" id="d-title" oninput="autoSaveSetting('title', this.value); updatePreview()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">부제목 텍스트</label>
+            <input type="text" class="form-input" id="d-subtitle" oninput="autoSaveSetting('subtitle', this.value); updatePreview()">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">제목 크기 (px)</label>
+              <input type="number" class="form-input" id="d-title-size" value="48" min="16" max="120" oninput="autoSaveSetting('title_size', parseInt(this.value)); updatePreview()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">부제목 크기 (px)</label>
+              <input type="number" class="form-input" id="d-subtitle-size" value="24" min="12" max="72" oninput="autoSaveSetting('subtitle_size', parseInt(this.value)); updatePreview()">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">제목 색상</label>
+              <div class="color-row">
+                <input type="color" id="d-title-color" value="#FFFFFF" oninput="autoSaveSetting('title_color', this.value); updatePreview()">
+                <input type="text" class="form-input" id="d-title-color-text" value="#FFFFFF" oninput="document.getElementById('d-title-color').value=this.value;autoSaveSetting('title_color',this.value);updatePreview();" style="flex:1">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">부제목 색상</label>
+              <div class="color-row">
+                <input type="color" id="d-subtitle-color" value="#A78BFA" oninput="autoSaveSetting('subtitle_color', this.value); updatePreview()">
+                <input type="text" class="form-input" id="d-subtitle-color-text" value="#A78BFA" oninput="document.getElementById('d-subtitle-color').value=this.value;autoSaveSetting('subtitle_color',this.value);updatePreview();" style="flex:1">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">🖥️ 화면 제어</div>
+          <div class="flex gap-8 flex-wrap">
+            <button class="btn btn-success" onclick="toggleVoteActive(true)">▶ 투표 시작</button>
+            <button class="btn btn-danger" onclick="toggleVoteActive(false)">■ 투표 종료</button>
+            <button class="btn btn-primary" onclick="startTimer()">⏱ 타이머 시작</button>
+            <button class="btn btn-ghost" onclick="pauseTimer()">⏸ 정지</button>
+            <button class="btn btn-ghost" onclick="resetTimer()">↩ 초기화</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MINI PREVIEW -->
+      <div class="card">
+        <div class="card-title">👁 미리보기</div>
+        <div class="display-preview" id="mini-preview">
+          <div style="text-align:center;width:100%;padding:20px;">
+            <div id="preview-title" style="font-size:28px;font-weight:800;color:#fff;margin-bottom:8px;">라이브 투표</div>
+            <div id="preview-subtitle" style="font-size:14px;color:#A78BFA;">지금 바로 투표하세요!</div>
+            <div style="margin-top:16px;display:flex;flex-direction:column;gap:6px;" id="preview-items"></div>
+          </div>
+        </div>
+        <div style="margin-top:12px;">
+          <button class="btn btn-ghost btn-sm" onclick="window.open('display.html','_blank')">🖥️ 실제 화면 새 탭으로 열기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ADD ITEM MODAL -->
+<div id="modal-bg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;backdrop-filter:blur(4px);" onclick="closeModal()">
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:32px;width:480px;max-width:90vw;" onclick="e=>e.stopPropagation()">
+    <div style="font-size:18px;font-weight:800;margin-bottom:24px;" id="modal-title">항목 추가</div>
+    <div class="form-group">
+      <label class="form-label">항목명 *</label>
+      <input type="text" class="form-input" id="modal-label" placeholder="예: 팀 A">
+    </div>
+    <div class="form-group">
+      <label class="form-label">설명 (선택)</label>
+      <input type="text" class="form-input" id="modal-desc" placeholder="짧은 설명...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">항목 색상</label>
+      <div class="color-row">
+        <input type="color" id="modal-color" value="#7C3AED">
+        <input type="text" class="form-input" id="modal-color-text" value="#7C3AED" oninput="document.getElementById('modal-color').value=this.value" style="flex:1">
+      </div>
+    </div>
+    <div class="flex gap-8 justify-between" style="margin-top:24px;">
+      <button class="btn btn-ghost" onclick="closeModal()">취소</button>
+      <button class="btn btn-primary" onclick="saveItem()">저장</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://ayizwqajaoqmjyhkcgcb.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5aXp3cWFqYW9xbWp5aGtjZ2NiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MDg5NzUsImV4cCI6MjA5MjE4NDk3NX0.SbvUfjmBL0eFO3Bv4F3YEw12qfG65iIMPbWy919T3fo';
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let settings = {};
+let items = [];
+let editingItemId = null;
+let localTimer = null;
+let timerInterval = null;
+
+// NAV
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item')[['dashboard','items','settings','paid','display_settings'].indexOf(id)].classList.add('active');
+  const titles = {dashboard:'대시보드',items:'투표 항목 관리',settings:'투표 설정',paid:'유료 투표 관리',display_settings:'표시 화면 설정'};
+  document.getElementById('topbar-title').textContent = titles[id] || '';
+  if(id === 'paid') loadPaidRequests();
+}
+
+// TOAST
+function toast(msg, type='success') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show ' + type;
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// SETTINGS
+async function loadSettings() {
+  const { data } = await db.from('vote_settings').select('*').eq('id','00000000-0000-0000-0000-000000000001').single();
+  if(data) {
+    settings = data;
+    applySettings();
+  }
+}
+
+function applySettings() {
+  const ids = ['title','subtitle','free_votes_per_user','timer_seconds','show_numbers','title_color','subtitle_color','title_size','subtitle_size'];
+  const map = {title:['s-title','d-title'],subtitle:['s-subtitle','d-subtitle'],free_votes_per_user:['s-free-votes'],timer_seconds:['s-timer','timer-set-input'],title_size:['d-title-size'],subtitle_size:['d-subtitle-size']};
+  
+  for(const [key, els] of Object.entries(map)) {
+    for(const id of els) {
+      const el = document.getElementById(id);
+      if(el) el.value = settings[key] ?? '';
+    }
+  }
+  
+  const snEl = document.getElementById('s-show-numbers');
+  if(snEl) snEl.checked = settings.show_numbers ?? true;
+  
+  // Colors
+  ['title','subtitle'].forEach(k => {
+    const c = settings[k+'_color'] || (k==='title'?'#FFFFFF':'#A78BFA');
+    const cp = document.getElementById('d-'+k+'-color');
+    const ct = document.getElementById('d-'+k+'-color-text');
+    if(cp) cp.value = c;
+    if(ct) ct.value = c;
+  });
+
+  // Timer
+  localTimer = settings.timer_remaining ?? settings.timer_seconds ?? 60;
+  renderTimer(localTimer);
+  
+  if(settings.timer_running) startLocalTimerLoop();
+  
+  // Sort
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  const sortMap = {desc:0,asc:1,manual:2};
+  const allSortBtns = document.querySelectorAll('#sort-selector .sort-btn');
+  if(allSortBtns[sortMap[settings.sort_order]]) allSortBtns[sortMap[settings.sort_order]].classList.add('active');
+  
+  // Status badge
+  const badge = document.getElementById('vote-status-badge');
+  if(settings.is_active) {
+    badge.textContent = '투표 활성';
+    badge.className = 'badge badge-active';
+  } else {
+    badge.textContent = '투표 비활성';
+    badge.className = 'badge badge-inactive';
+  }
+  
+  updatePreview();
+}
+
+async function autoSaveSetting(key, value) {
+  settings[key] = value;
+  await db.from('vote_settings').update({[key]:value,updated_at:new Date().toISOString()}).eq('id','00000000-0000-0000-0000-000000000001');
+}
+
+async function saveSettings() {
+  const upd = {
+    title: document.getElementById('s-title').value,
+    subtitle: document.getElementById('s-subtitle').value,
+    free_votes_per_user: parseInt(document.getElementById('s-free-votes').value),
+    timer_seconds: parseInt(document.getElementById('s-timer').value),
+    show_numbers: document.getElementById('s-show-numbers').checked,
+    updated_at: new Date().toISOString()
+  };
+  await db.from('vote_settings').update(upd).eq('id','00000000-0000-0000-0000-000000000001');
+  Object.assign(settings, upd);
+  toast('설정 저장됨');
+}
+
+// VOTE ACTIVE
+async function toggleVoteActive(val) {
+  await autoSaveSetting('is_active', val);
+  settings.is_active = val;
+  applySettings();
+  toast(val ? '▶ 투표 시작됨' : '■ 투표 종료됨', val ? 'success' : 'error');
+}
+
+// TIMER
+function renderTimer(secs) {
+  const m = Math.floor(secs / 60);
+  const s = secs % 60;
+  document.getElementById('timer-min').textContent = String(m).padStart(2,'0');
+  document.getElementById('timer-sec').textContent = String(s).padStart(2,'0');
+  const isActive = settings.timer_running;
+  document.getElementById('timer-min').classList.toggle('active', isActive);
+  document.getElementById('timer-sec').classList.toggle('active', isActive);
+}
+
+async function startTimer() {
+  await db.from('vote_settings').update({timer_running:true,timer_remaining:localTimer,updated_at:new Date().toISOString()}).eq('id','00000000-0000-0000-0000-000000000001');
+  settings.timer_running = true;
+  startLocalTimerLoop();
+  toast('타이머 시작');
+}
+
+async function pauseTimer() {
+  clearInterval(timerInterval);
+  await db.from('vote_settings').update({timer_running:false,timer_remaining:localTimer,updated_at:new Date().toISOString()}).eq('id','00000000-0000-0000-0000-000000000001');
+  settings.timer_running = false;
+  renderTimer(localTimer);
+  toast('타이머 정지');
+}
+
+async function resetTimer() {
+  clearInterval(timerInterval);
+  const dur = settings.timer_seconds || 60;
+  localTimer = dur;
+  await db.from('vote_settings').update({timer_running:false,timer_remaining:dur,updated_at:new Date().toISOString()}).eq('id','00000000-0000-0000-0000-000000000001');
+  settings.timer_running = false;
+  renderTimer(localTimer);
+  toast('타이머 초기화');
+}
+
+function startLocalTimerLoop() {
+  clearInterval(timerInterval);
+  timerInterval = setInterval(async () => {
+    if(localTimer > 0) {
+      localTimer--;
+      renderTimer(localTimer);
+      // sync every 5s
+      if(localTimer % 5 === 0) {
+        await db.from('vote_settings').update({timer_remaining:localTimer,updated_at:new Date().toISOString()}).eq('id','00000000-0000-0000-0000-000000000001');
+      }
+    } else {
+      clearInterval(timerInterval);
+      await db.from('vote_settings').update({timer_running:false,timer_remaining:0,updated_at:new Date().toISOString()}).eq('id','00000000-0000-0000-0000-000000000001');
+      settings.timer_running = false;
+      toast('타이머 종료!','error');
+    }
+  }, 1000);
+}
+
+async function setTimerDuration() {
+  const val = parseInt(document.getElementById('timer-set-input').value) || 60;
+  localTimer = val;
+  await autoSaveSetting('timer_seconds', val);
+  await autoSaveSetting('timer_remaining', val);
+  renderTimer(val);
+}
+
+// RESET VOTES
+async function resetAllVotes() {
+  if(!confirm('모든 항목의 투표수를 초기화하시겠습니까?')) return;
+  await db.from('vote_items').update({vote_count:0,paid_votes:0}).neq('id','00000000-0000-0000-0000-000000000000');
+  await db.from('vote_records').delete().neq('id','00000000-0000-0000-0000-000000000000');
+  await db.from('free_vote_usage').delete().neq('id','00000000-0000-0000-0000-000000000000');
+  toast('투표수 초기화됨');
+  loadItems();
+}
+
+// ITEMS
+async function loadItems() {
+  const { data } = await db.from('vote_items').select('*').order('sort_position');
+  if(data) {
+    items = data;
+    renderItems();
+    renderDashboardStats();
+    renderTopItems();
+  }
+}
+
+function getSortedItems() {
+  const sorted = [...items];
+  if(settings.sort_order === 'desc') sorted.sort((a,b) => b.vote_count - a.vote_count);
+  else if(settings.sort_order === 'asc') sorted.sort((a,b) => a.vote_count - b.vote_count);
+  else sorted.sort((a,b) => a.sort_position - b.sort_position);
+  return sorted;
+}
+
+function renderItems() {
+  const tbody = document.getElementById('items-tbody');
+  const sorted = getSortedItems();
+  if(!sorted.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text2);padding:40px">항목이 없습니다.</td></tr>';
+    return;
+  }
+  const total = sorted.reduce((a,b) => a + b.vote_count, 0);
+  tbody.innerHTML = sorted.map((item, idx) => {
+    const pct = total > 0 ? Math.round(item.vote_count / total * 100) : 0;
+    return `
+    <tr draggable="true" data-id="${item.id}" ondragstart="dragStart(event)" ondragover="dragOver(event)" ondrop="drop(event)" ondragleave="dragLeave(event)">
+      <td><span class="drag-handle" title="드래그해서 순서 변경">⠿</span></td>
+      <td><div class="rank-num">${idx+1}</div></td>
+      <td>
+        <div style="font-weight:600">${item.label}</div>
+        ${item.description ? `<div style="font-size:12px;color:var(--text2)">${item.description}</div>` : ''}
+      </td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <div style="width:20px;height:20px;border-radius:6px;background:${item.color};border:1px solid rgba(255,255,255,0.2)"></div>
+          <span style="font-size:12px;color:var(--text2)">${item.color}</span>
+        </div>
+      </td>
+      <td>
+        <div class="vote-bar-wrap">
+          <div class="vote-bar-bg"><div class="vote-bar-fill" style="width:${pct}%;background:${item.color}"></div></div>
+          <span class="item-vote-display" style="color:${item.color}">${item.vote_count}</span>
+          <span style="font-size:11px;color:var(--text2)">${pct}%</span>
+        </div>
+      </td>
+      <td>
+        <div style="display:flex;align-items:center;gap:4px;">
+          <button class="btn btn-ghost btn-sm" onclick="adjustVote('${item.id}', -10)">-10</button>
+          <button class="btn btn-ghost btn-sm" onclick="adjustVote('${item.id}', -1)">-1</button>
+          <button class="btn btn-primary btn-sm" onclick="adjustVote('${item.id}', 1)">+1</button>
+          <button class="btn btn-primary btn-sm" onclick="adjustVote('${item.id}', 10)">+10</button>
+        </div>
+      </td>
+      <td>
+        <div style="display:flex;gap:4px;">
+          <button class="btn btn-ghost btn-sm" onclick="editItem('${item.id}')">✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteItem('${item.id}')">🗑</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function renderDashboardStats() {
+  const total = items.reduce((a,b) => a+b.vote_count, 0);
+  const paid = items.reduce((a,b) => a+(b.paid_votes||0), 0);
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-free').textContent = total - paid;
+  document.getElementById('stat-paid').textContent = paid;
+  document.getElementById('stat-items').textContent = items.length;
+}
+
+function renderTopItems() {
+  const sorted = [...items].sort((a,b) => b.vote_count - a.vote_count).slice(0,5);
+  const total = items.reduce((a,b) => a+b.vote_count, 0);
+  const container = document.getElementById('dashboard-top-items');
+  if(!sorted.length) { container.innerHTML = '<div class="text-muted text-sm">항목 없음</div>'; return; }
+  container.innerHTML = sorted.map((item, i) => {
+    const pct = total > 0 ? Math.round(item.vote_count/total*100) : 0;
+    return `<div style="display:flex;align-items:center;gap:10px;">
+      <div style="width:24px;height:24px;border-radius:8px;background:${item.color};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white">${i+1}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600;margin-bottom:3px">${item.label}</div>
+        <div class="vote-bar-bg"><div class="vote-bar-fill" style="width:${pct}%;background:${item.color}"></div></div>
+      </div>
+      <span style="font-weight:700;color:${item.color};min-width:30px;text-align:right">${item.vote_count}</span>
+    </div>`;
+  }).join('');
+}
+
+async function adjustVote(id, delta) {
+  const item = items.find(i => i.id === id);
+  if(!item) return;
+  const newCount = Math.max(0, item.vote_count + delta);
+  await db.from('vote_items').update({vote_count:newCount,updated_at:new Date().toISOString()}).eq('id',id);
+  item.vote_count = newCount;
+  renderItems();
+  renderDashboardStats();
+  renderTopItems();
+}
+
+// MODAL
+function showAddItemModal() {
+  editingItemId = null;
+  document.getElementById('modal-title').textContent = '항목 추가';
+  document.getElementById('modal-label').value = '';
+  document.getElementById('modal-desc').value = '';
+  document.getElementById('modal-color').value = '#7C3AED';
+  document.getElementById('modal-color-text').value = '#7C3AED';
+  document.getElementById('modal-bg').style.display = 'block';
+}
+
+function editItem(id) {
+  const item = items.find(i => i.id === id);
+  if(!item) return;
+  editingItemId = id;
+  document.getElementById('modal-title').textContent = '항목 수정';
+  document.getElementById('modal-label').value = item.label;
+  document.getElementById('modal-desc').value = item.description || '';
+  document.getElementById('modal-color').value = item.color || '#7C3AED';
+  document.getElementById('modal-color-text').value = item.color || '#7C3AED';
+  document.getElementById('modal-bg').style.display = 'block';
+}
+
+function closeModal() { document.getElementById('modal-bg').style.display = 'none'; }
+
+async function saveItem() {
+  const label = document.getElementById('modal-label').value.trim();
+  if(!label) { toast('항목명을 입력하세요','error'); return; }
+  const color = document.getElementById('modal-color').value;
+  const description = document.getElementById('modal-desc').value.trim();
+  
+  if(editingItemId) {
+    await db.from('vote_items').update({label,description,color,updated_at:new Date().toISOString()}).eq('id',editingItemId);
+    toast('항목 수정됨');
+  } else {
+    const maxPos = items.length > 0 ? Math.max(...items.map(i=>i.sort_position)) + 1 : 0;
+    await db.from('vote_items').insert({label,description,color,sort_position:maxPos});
+    toast('항목 추가됨');
+  }
+  closeModal();
+  loadItems();
+}
+
+async function deleteItem(id) {
+  if(!confirm('이 항목을 삭제하시겠습니까?')) return;
+  await db.from('vote_items').delete().eq('id',id);
+  toast('항목 삭제됨');
+  loadItems();
+}
+
+// SORT
+async function setSortOrder(order) {
+  settings.sort_order = order;
+  await autoSaveSetting('sort_order', order);
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  const allBtns = document.querySelectorAll('#sort-selector .sort-btn');
+  const orderMap = {desc:0,asc:1,manual:2};
+  if(allBtns[orderMap[order]]) allBtns[orderMap[order]].classList.add('active');
+  renderItems();
+}
+
+// DRAG & DROP
+let dragSrcId = null;
+function dragStart(e) { dragSrcId = e.currentTarget.dataset.id; e.currentTarget.classList.add('dragging'); }
+function dragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+function dragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+async function drop(e) {
+  e.preventDefault();
+  const targetId = e.currentTarget.dataset.id;
+  e.currentTarget.classList.remove('drag-over');
+  document.querySelectorAll('.dragging').forEach(el => el.classList.remove('dragging'));
+  if(dragSrcId === targetId) return;
+  
+  const srcIdx = items.findIndex(i => i.id === dragSrcId);
+  const tgtIdx = items.findIndex(i => i.id === targetId);
+  const sorted = getSortedItems();
+  const srcSortedIdx = sorted.findIndex(i => i.id === dragSrcId);
+  const tgtSortedIdx = sorted.findIndex(i => i.id === targetId);
+  sorted.splice(tgtSortedIdx, 0, sorted.splice(srcSortedIdx, 1)[0]);
+  
+  for(let i=0;i<sorted.length;i++) {
+    await db.from('vote_items').update({sort_position:i}).eq('id',sorted[i].id);
+    sorted[i].sort_position = i;
+  }
+  items = sorted;
+  if(settings.sort_order !== 'manual') { settings.sort_order = 'manual'; await autoSaveSetting('sort_order','manual'); }
+  renderItems();
+}
+
+// PAID REQUESTS
+async function loadPaidRequests() {
+  const { data } = await db.from('paid_vote_requests').select('*, vote_items(label)').order('created_at', {ascending:false});
+  const tbody = document.getElementById('paid-tbody');
+  if(!data || !data.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text2);padding:40px">유료 투표 요청 없음</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map(r => `
+    <tr>
+      <td style="color:var(--text2);font-size:12px">${new Date(r.created_at).toLocaleString('ko-KR')}</td>
+      <td style="font-weight:600">${r.voter_name}</td>
+      <td>${r.vote_items?.label || '—'}</td>
+      <td><span class="tag">+${r.amount}표</span></td>
+      <td style="color:var(--text2)">${r.payment_proof || '—'}</td>
+      <td><span class="badge badge-${r.status}">${{pending:'대기중',approved:'승인됨',rejected:'거절됨'}[r.status]}</span></td>
+      <td>
+        ${r.status==='pending' ? `
+        <div style="display:flex;gap:4px;">
+          <button class="btn btn-success btn-sm" onclick="approvePaid('${r.id}')">✓ 승인</button>
+          <button class="btn btn-danger btn-sm" onclick="rejectPaid('${r.id}')">✗ 거절</button>
+        </div>` : '—'}
+      </td>
+    </tr>`).join('');
+}
+
+async function approvePaid(id) {
+  const { data } = await db.rpc('approve_paid_vote', {p_request_id: id});
+  if(data?.success) { toast('✓ 유료 투표 승인됨', 'success'); loadPaidRequests(); loadItems(); }
+  else toast(data?.message || '오류 발생', 'error');
+}
+
+async function rejectPaid(id) {
+  await db.from('paid_vote_requests').update({status:'rejected',updated_at:new Date().toISOString()}).eq('id',id);
+  toast('거절됨'); loadPaidRequests();
+}
+
+// PREVIEW
+function updatePreview() {
+  const t = document.getElementById('d-title')?.value || settings.title || '라이브 투표';
+  const s = document.getElementById('d-subtitle')?.value || settings.subtitle || '투표하세요';
+  const tc = document.getElementById('d-title-color')?.value || settings.title_color || '#FFFFFF';
+  const sc = document.getElementById('d-subtitle-color')?.value || settings.subtitle_color || '#A78BFA';
+  const ts = document.getElementById('d-title-size')?.value || settings.title_size || 48;
+  const ss = document.getElementById('d-subtitle-size')?.value || settings.subtitle_size || 24;
+  const pt = document.getElementById('preview-title');
+  const ps = document.getElementById('preview-subtitle');
+  if(pt) { pt.textContent = t; pt.style.color = tc; pt.style.fontSize = Math.min(parseInt(ts)/2, 32)+'px'; }
+  if(ps) { ps.textContent = s; ps.style.color = sc; ps.style.fontSize = Math.min(parseInt(ss)/2, 18)+'px'; }
+  
+  const pi = document.getElementById('preview-items');
+  if(pi && items.length) {
+    const total = items.reduce((a,b)=>a+b.vote_count,0);
+    const sorted = getSortedItems().slice(0,4);
+    pi.innerHTML = sorted.map((item,i) => {
+      const pct = total > 0 ? Math.round(item.vote_count/total*100) : 0;
+      return `<div style="display:flex;align-items:center;gap:6px;font-size:10px;">
+        <span style="color:${item.color};font-weight:700">${i+1}.</span>
+        <span>${item.label}</span>
+        <div style="flex:1;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden"><div style="width:${pct}%;height:100%;background:${item.color}"></div></div>
+        <span style="color:${item.color}">${item.vote_count}</span>
+      </div>`;
+    }).join('');
+  }
+}
+
+// REALTIME
+function setupRealtime() {
+  db.channel('admin-realtime')
+    .on('postgres_changes', {event:'*',schema:'public',table:'vote_items'}, () => loadItems())
+    .on('postgres_changes', {event:'*',schema:'public',table:'vote_settings'}, payload => {
+      // Don't overwrite local timer if we're running it
+      const newData = payload.new;
+      if(!settings.timer_running) {
+        localTimer = newData.timer_remaining ?? localTimer;
+        renderTimer(localTimer);
+      }
+    })
+    .on('postgres_changes', {event:'INSERT',schema:'public',table:'paid_vote_requests'}, () => {
+      toast('💰 새 유료 투표 요청!', 'success');
+    })
+    .subscribe();
+}
+
+// INIT
+async function init() {
+  await loadSettings();
+  await loadItems();
+  setupRealtime();
+}
+
+init();
+</script>
+</body>
+</html>
