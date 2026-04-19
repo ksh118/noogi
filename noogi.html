@@ -20,218 +20,129 @@ body {
   justify-content: center;
   overflow: hidden;
   position: relative;
+  transition: background 0.8s;
 }
 
-/* BACKGROUND EFFECTS */
+/* BG ORBS */
 .bg-orbs {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  transition: opacity 0.8s;
 }
 .orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.12;
+  position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.12;
 }
-.orb-1 { width: 500px; height: 500px; background: #7C3AED; top: -100px; left: -100px; animation: float1 12s infinite alternate ease-in-out; }
-.orb-2 { width: 400px; height: 400px; background: #3B82F6; bottom: -80px; right: -80px; animation: float2 10s infinite alternate ease-in-out; }
-.orb-3 { width: 300px; height: 300px; background: #EC4899; top: 50%; right: 20%; animation: float3 14s infinite alternate ease-in-out; }
+.orb-1 { width: 500px; height: 500px; background: #7C3AED; top: -100px; left: -100px; animation: f1 12s infinite alternate ease-in-out; }
+.orb-2 { width: 400px; height: 400px; background: #3B82F6; bottom: -80px; right: -80px; animation: f2 10s infinite alternate ease-in-out; }
+.orb-3 { width: 300px; height: 300px; background: #EC4899; top: 50%; right: 20%; animation: f3 14s infinite alternate ease-in-out; }
+@keyframes f1 { 0%{transform:translate(0,0)} 100%{transform:translate(60px,40px)} }
+@keyframes f2 { 0%{transform:translate(0,0)} 100%{transform:translate(-40px,60px)} }
+@keyframes f3 { 0%{transform:translate(0,0)} 100%{transform:translate(30px,-50px)} }
 
-@keyframes float1 { 0%{transform:translate(0,0)} 100%{transform:translate(60px,40px)} }
-@keyframes float2 { 0%{transform:translate(0,0)} 100%{transform:translate(-40px,60px)} }
-@keyframes float3 { 0%{transform:translate(0,0)} 100%{transform:translate(30px,-50px)} }
-
-/* INACTIVE STATE */
+/* INACTIVE */
 .inactive-screen {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-  background: rgba(11,11,21,0.95);
-  transition: opacity 0.5s;
+  position: fixed; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  z-index: 10; background: rgba(0,0,0,0.88); transition: opacity 0.5s;
 }
 .inactive-screen.hidden { opacity: 0; pointer-events: none; }
-.inactive-icon { font-size: 64px; margin-bottom: 16px; opacity: 0.4; }
-.inactive-text { font-size: 24px; font-weight: 700; color: rgba(255,255,255,0.4); }
-.inactive-sub { font-size: 14px; color: rgba(255,255,255,0.25); margin-top: 8px; }
+.inactive-icon { font-size: 56px; margin-bottom: 14px; opacity: 0.35; }
+.inactive-text { font-size: 22px; font-weight: 700; color: rgba(255,255,255,0.35); }
+.inactive-sub { font-size: 13px; color: rgba(255,255,255,0.2); margin-top: 8px; }
 
 /* MAIN CONTENT */
 .content {
-  position: relative;
-  z-index: 5;
-  width: 100%;
-  max-width: 900px;
-  padding: 40px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 32px;
-  opacity: 0;
-  transition: opacity 0.6s;
+  position: relative; z-index: 5;
+  width: 100%; max-width: 920px; padding: 40px;
+  display: flex; flex-direction: column; align-items: center; gap: 28px;
+  opacity: 0; transition: opacity 0.6s;
 }
 .content.visible { opacity: 1; }
 
 /* HEADER */
-.header { text-align: center; }
-.title {
-  font-weight: 900;
-  line-height: 1.1;
-  margin-bottom: 10px;
+.display-title {
+  font-weight: 900; line-height: 1.1; text-align: center;
   text-shadow: 0 4px 30px rgba(0,0,0,0.5);
-  transition: all 0.4s ease;
+  transition: all 0.4s;
 }
-.subtitle {
-  font-weight: 500;
-  line-height: 1.4;
-  transition: all 0.4s ease;
+.display-subtitle {
+  font-weight: 500; line-height: 1.4; text-align: center;
+  transition: all 0.4s;
 }
 
 /* TIMER */
-.timer-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.timer-wrap {
+  display: flex; align-items: center; gap: 10px;
+  transition: all 0.4s; overflow: hidden;
 }
-.timer-digit-group { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-.timer-label { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); letter-spacing: 0.15em; text-transform: uppercase; }
-.timer-box {
-  background: rgba(255,255,255,0.05);
-  border: 2px solid rgba(255,255,255,0.12);
-  border-radius: 16px;
-  width: 80px;
-  height: 88px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 48px;
-  font-weight: 900;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -2px;
-  backdrop-filter: blur(10px);
+.timer-wrap.hidden-timer { max-height: 0; opacity: 0; pointer-events: none; margin: 0; }
+.t-grp { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.t-lbl { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); letter-spacing: 0.15em; text-transform: uppercase; }
+.t-box {
+  background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.12);
+  border-radius: 16px; width: 80px; height: 88px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 48px; font-weight: 900; font-variant-numeric: tabular-nums;
+  letter-spacing: -2px; position: relative; overflow: hidden;
   transition: all 0.3s;
-  position: relative;
-  overflow: hidden;
 }
-.timer-box::before {
-  content: '';
-  position: absolute;
-  inset: 0;
+.t-box::before {
+  content: ''; position: absolute; inset: 0;
   background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, transparent 100%);
 }
-.timer-box.urgent {
-  border-color: #EF4444;
-  box-shadow: 0 0 30px rgba(239,68,68,0.4), inset 0 0 20px rgba(239,68,68,0.1);
-  animation: shake 0.3s infinite;
-}
-.timer-box.warning { border-color: #F59E0B; box-shadow: 0 0 20px rgba(245,158,11,0.3); }
-.timer-box.running { border-color: rgba(124,58,237,0.6); box-shadow: 0 0 20px rgba(124,58,237,0.3); }
-
-@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-2px)} 75%{transform:translateX(2px)} }
-
-.timer-sep {
-  font-size: 40px;
-  font-weight: 900;
-  color: rgba(255,255,255,0.3);
-  padding-bottom: 20px;
-  animation: blink 1s infinite;
-}
+.t-box.urgent { border-color: #EF4444; box-shadow: 0 0 30px rgba(239,68,68,0.4); animation: tshake 0.3s infinite; color: #EF4444; }
+.t-box.warning { border-color: #F59E0B; box-shadow: 0 0 20px rgba(245,158,11,0.3); color: #F59E0B; }
+.t-box.running { border-color: rgba(124,58,237,0.6); box-shadow: 0 0 20px rgba(124,58,237,0.3); }
+@keyframes tshake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-2px)} 75%{transform:translateX(2px)} }
+.t-sep { font-size: 40px; font-weight: 900; color: rgba(255,255,255,0.3); padding-bottom: 20px; animation: blink 1s infinite; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
 /* ITEMS */
-.items-container {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
+.items-container { width: 100%; display: flex; flex-direction: column; gap: 12px; }
 .vote-item {
   position: relative;
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 16px;
-  padding: 16px 20px;
-  backdrop-filter: blur(10px);
-  overflow: hidden;
-  transition: all 0.4s ease;
+  border-radius: 16px; padding: 16px 20px;
+  backdrop-filter: blur(10px); overflow: hidden;
+  transition: all 0.4s;
 }
 .vote-item::before {
-  content: '';
-  position: absolute;
-  inset: 0;
+  content: ''; position: absolute; inset: 0;
   background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 60%);
-  pointer-events: none;
 }
-
 .item-bg-fill {
-  position: absolute;
-  top: 0; left: 0; bottom: 0;
-  border-radius: 16px;
-  opacity: 0.12;
+  position: absolute; top:0; left:0; bottom:0;
+  border-radius: 16px; opacity: 0.1;
   transition: width 0.8s cubic-bezier(0.34,1.56,0.64,1);
 }
-
-.item-content {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
+.item-content { position: relative; z-index: 2; display: flex; align-items: center; gap: 14px; }
 .item-rank {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 900;
-  font-size: 15px;
-  flex-shrink: 0;
+  width: 36px; height: 36px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 14px; flex-shrink: 0;
 }
-
 .item-info { flex: 1; }
 .item-label { font-size: 18px; font-weight: 700; margin-bottom: 2px; }
 .item-desc { font-size: 12px; color: rgba(255,255,255,0.5); }
-
 .item-right { text-align: right; flex-shrink: 0; }
 .item-count { font-size: 32px; font-weight: 900; letter-spacing: -1px; }
 .item-pct { font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 2px; }
-
-.item-bar-wrap { margin-top: 10px; position: relative; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
+.item-bar-wrap { margin-top: 10px; position: relative; height: 5px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
 .item-bar { position: absolute; top:0;left:0;bottom:0; border-radius: 3px; transition: width 0.8s cubic-bezier(0.34,1.56,0.64,1); }
-
-/* UPDATE FLASH */
-@keyframes flash {
-  0%{background:rgba(255,255,255,0.15)}
-  100%{background:rgba(255,255,255,0.04)}
-}
+.vote-item.lead { border-color: rgba(255,255,255,0.2); }
+@keyframes flash { 0%{background:rgba(255,255,255,0.14)} 100%{background:rgba(255,255,255,0.04)} }
 .vote-item.updated { animation: flash 0.5s ease-out; }
 
-/* LEAD ITEM GLOW */
-.vote-item.lead { border-color: rgba(255,255,255,0.2); }
-
-/* WATERMARK */
 .watermark {
-  position: fixed;
-  bottom: 16px;
-  right: 16px;
-  font-size: 11px;
-  color: rgba(255,255,255,0.2);
+  position: fixed; bottom: 14px; right: 14px;
+  font-size: 11px; color: rgba(255,255,255,0.15); z-index: 10;
   letter-spacing: 0.1em;
-  z-index: 10;
 }
 </style>
 </head>
 <body>
 
-<div class="bg-orbs">
+<div class="bg-orbs" id="bg-orbs">
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
   <div class="orb orb-3"></div>
@@ -244,28 +155,27 @@ body {
 </div>
 
 <div class="content" id="main-content">
-  <div class="header">
-    <div class="title" id="display-title">🎯 라이브 투표</div>
-    <div class="subtitle" id="display-subtitle">지금 바로 투표하세요!</div>
+  <div style="text-align:center">
+    <div class="display-title" id="display-title">🎯 라이브 투표</div>
+    <div class="display-subtitle" id="display-subtitle" style="margin-top:8px">지금 바로 투표하세요!</div>
   </div>
 
-  <div class="timer-wrapper" id="timer-wrapper">
-    <div class="timer-digit-group">
-      <div class="timer-label">분</div>
-      <div class="timer-box" id="t-min">00</div>
+  <div class="timer-wrap" id="timer-wrap">
+    <div class="t-grp">
+      <div class="t-lbl">분</div>
+      <div class="t-box" id="t-min">00</div>
     </div>
-    <div class="timer-sep" id="timer-sep">:</div>
-    <div class="timer-digit-group">
-      <div class="timer-label">초</div>
-      <div class="timer-box" id="t-sec">00</div>
+    <div class="t-sep">:</div>
+    <div class="t-grp">
+      <div class="t-lbl">초</div>
+      <div class="t-box" id="t-sec">00</div>
     </div>
   </div>
 
-  <div class="items-container" id="items-container">
-  </div>
+  <div class="items-container" id="items-container"></div>
 </div>
 
-<div class="watermark">🎯 LIVE VOTE</div>
+<div class="watermark">LIVE VOTE</div>
 
 <script>
 const SUPABASE_URL = 'https://ayizwqajaoqmjyhkcgcb.supabase.co';
@@ -273,14 +183,10 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let settings = {};
-let items = [];
-let localTimer = 0;
-let timerInterval = null;
-let lastVoteCounts = {};
+let settings = {}, items = [], localTimer = 0, timerInterval = null, lastVoteCounts = {};
 
 async function loadAll() {
-  const [{ data: s }, { data: i }] = await Promise.all([
+  const [{data:s},{data:i}] = await Promise.all([
     db.from('vote_settings').select('*').eq('id','00000000-0000-0000-0000-000000000001').single(),
     db.from('vote_items').select('*').order('sort_position')
   ]);
@@ -291,18 +197,25 @@ async function loadAll() {
 function applySettings() {
   const t = document.getElementById('display-title');
   const s = document.getElementById('display-subtitle');
-  
+  const body = document.body;
+  const orbs = document.getElementById('bg-orbs');
+  const inactive = document.getElementById('inactive-screen');
+  const content = document.getElementById('main-content');
+  const timerWrap = document.getElementById('timer-wrap');
+
   t.textContent = settings.title || '🎯 라이브 투표';
   t.style.color = settings.title_color || '#FFFFFF';
   t.style.fontSize = (settings.title_size || 48) + 'px';
-  
+
   s.textContent = settings.subtitle || '지금 바로 투표하세요!';
   s.style.color = settings.subtitle_color || '#A78BFA';
   s.style.fontSize = (settings.subtitle_size || 24) + 'px';
-  
-  const inactive = document.getElementById('inactive-screen');
-  const content = document.getElementById('main-content');
-  
+
+  // Background
+  body.style.background = settings.bg_color || '#0B0B15';
+  orbs.style.opacity = settings.bg_effect !== false ? '1' : '0';
+
+  // Active
   if(settings.is_active) {
     inactive.classList.add('hidden');
     content.classList.add('visible');
@@ -311,84 +224,73 @@ function applySettings() {
     content.classList.remove('visible');
   }
 
+  // Timer visibility
+  const timerVis = settings.timer_visible !== false;
+  timerWrap.classList.toggle('hidden-timer', !timerVis);
+
+  // Timer value
   localTimer = settings.timer_remaining ?? 0;
   renderTimer(localTimer);
-  
-  clearInterval(timerInterval);
-  if(settings.timer_running && localTimer > 0) {
-    startLocalTimer();
+  clearInterval(timerInterval); timerInterval = null;
+  if(settings.timer_running && localTimer > 0 && timerVis) {
+    timerInterval = setInterval(() => {
+      if(localTimer > 0) { localTimer--; renderTimer(localTimer); }
+      else clearInterval(timerInterval);
+    }, 1000);
   }
 }
 
 function renderTimer(secs) {
-  const m = Math.floor(secs/60);
-  const s = secs%60;
+  const m = Math.floor(secs/60), s = secs%60;
   document.getElementById('t-min').textContent = String(m).padStart(2,'0');
   document.getElementById('t-sec').textContent = String(s).padStart(2,'0');
-  
-  const boxes = document.querySelectorAll('.timer-box');
-  boxes.forEach(b => {
+  document.querySelectorAll('.t-box').forEach(b => {
     b.classList.remove('urgent','warning','running');
-    if(secs <= 10) b.classList.add('urgent');
-    else if(secs <= 30) b.classList.add('warning');
+    if(secs<=10) b.classList.add('urgent');
+    else if(secs<=30) b.classList.add('warning');
     else if(settings.timer_running) b.classList.add('running');
   });
-  
-  const sep = document.getElementById('timer-sep');
+  const sep = document.getElementById('timer-wrap').querySelector('.t-sep');
   if(sep) sep.style.animationPlayState = settings.timer_running ? 'running' : 'paused';
 }
 
-function startLocalTimer() {
-  timerInterval = setInterval(() => {
-    if(localTimer > 0) {
-      localTimer--;
-      renderTimer(localTimer);
-    } else {
-      clearInterval(timerInterval);
-    }
-  }, 1000);
-}
-
 function getSortedItems() {
-  const sorted = [...items];
-  if(settings.sort_order === 'desc') sorted.sort((a,b) => b.vote_count - a.vote_count);
-  else if(settings.sort_order === 'asc') sorted.sort((a,b) => a.vote_count - b.vote_count);
-  else sorted.sort((a,b) => a.sort_position - b.sort_position);
-  return sorted;
+  const s = [...items];
+  if(settings.sort_order==='desc') s.sort((a,b)=>b.vote_count-a.vote_count);
+  else if(settings.sort_order==='asc') s.sort((a,b)=>a.vote_count-b.vote_count);
+  else s.sort((a,b)=>a.sort_position-b.sort_position);
+  return s;
 }
 
 function renderItems() {
   const container = document.getElementById('items-container');
   const sorted = getSortedItems();
-  const total = sorted.reduce((a,b) => a+b.vote_count, 0);
+  const total = sorted.reduce((a,b)=>a+b.vote_count,0);
   const showNumbers = settings.show_numbers !== false;
-  
   if(!sorted.length) {
-    container.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.3);font-size:16px;padding:40px">투표 항목이 없습니다</div>';
+    container.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.3);padding:40px">투표 항목 없음</div>';
     return;
   }
+  const maxCount = Math.max(...sorted.map(i=>i.vote_count),1);
 
-  const maxCount = Math.max(...sorted.map(i => i.vote_count), 1);
-  
-  sorted.forEach((item, idx) => {
-    const pct = total > 0 ? Math.round(item.vote_count/total*100) : 0;
+  sorted.forEach((item,idx) => {
+    const pct = total>0?Math.round(item.vote_count/total*100):0;
     const barPct = Math.round(item.vote_count/maxCount*100);
-    const isLead = idx === 0 && item.vote_count > 0;
-    const wasUpdated = lastVoteCounts[item.id] !== undefined && lastVoteCounts[item.id] !== item.vote_count;
-    
-    let el = document.getElementById('item-' + item.id);
-    
+    const isLead = idx===0 && item.vote_count>0;
+    const wasUpdated = lastVoteCounts[item.id]!==undefined && lastVoteCounts[item.id]!==item.vote_count;
+
+    let el = document.getElementById('item-'+item.id);
     if(!el) {
       el = document.createElement('div');
-      el.id = 'item-' + item.id;
+      el.id = 'item-'+item.id;
       el.className = 'vote-item';
       el.innerHTML = `
         <div class="item-bg-fill" id="bg-${item.id}"></div>
         <div class="item-content">
-          ${showNumbers ? `<div class="item-rank" id="rank-${item.id}">${idx+1}</div>` : ''}
+          ${showNumbers?`<div class="item-rank" id="rank-${item.id}" style="background:${item.color}22;color:${item.color}">${idx+1}</div>`:''}
           <div class="item-info">
-            <div class="item-label" id="label-${item.id}">${item.label}</div>
-            ${item.description ? `<div class="item-desc">${item.description}</div>` : ''}
+            <div class="item-label">${item.label}</div>
+            ${item.description?`<div class="item-desc">${item.description}</div>`:''}
           </div>
           <div class="item-right">
             <div class="item-count" id="count-${item.id}" style="color:${item.color}">${item.vote_count}</div>
@@ -399,54 +301,40 @@ function renderItems() {
       `;
       container.appendChild(el);
     } else {
-      // Update existing
       const countEl = document.getElementById('count-'+item.id);
       const pctEl = document.getElementById('pct-'+item.id);
       const barEl = document.getElementById('bar-'+item.id);
-      const bgEl = document.getElementById('bg-'+item.id);
       const rankEl = document.getElementById('rank-'+item.id);
-      
       if(countEl) { countEl.textContent = item.vote_count; countEl.style.color = item.color; }
-      if(pctEl) pctEl.textContent = pct + '%';
-      if(barEl) { barEl.style.width = barPct + '%'; barEl.style.background = item.color; }
-      if(bgEl) { bgEl.style.background = item.color; bgEl.style.width = barPct + '%'; }
+      if(pctEl) pctEl.textContent = pct+'%';
+      if(barEl) { barEl.style.width = barPct+'%'; barEl.style.background = item.color; }
       if(rankEl) rankEl.textContent = idx+1;
     }
-    
+
     const bgEl = document.getElementById('bg-'+item.id);
-    if(bgEl) { bgEl.style.background = item.color; bgEl.style.width = barPct + '%'; }
-    
+    if(bgEl) { bgEl.style.background = item.color; bgEl.style.width = barPct+'%'; }
+
     el.classList.toggle('lead', isLead);
     if(wasUpdated) {
       el.classList.add('updated');
-      setTimeout(() => el.classList.remove('updated'), 500);
+      setTimeout(()=>el.classList.remove('updated'),500);
     }
-    
     lastVoteCounts[item.id] = item.vote_count;
-    
-    // Reorder DOM
     container.appendChild(el);
   });
 
   // Remove deleted items
-  const currentIds = sorted.map(i => 'item-'+i.id);
-  container.querySelectorAll('.vote-item').forEach(el => {
-    if(!currentIds.includes(el.id)) el.remove();
-  });
+  const ids = sorted.map(i=>'item-'+i.id);
+  container.querySelectorAll('.vote-item').forEach(el => { if(!ids.includes(el.id)) el.remove(); });
 }
 
 function setupRealtime() {
-  db.channel('display-realtime')
+  db.channel('display-rt-v2')
     .on('postgres_changes', {event:'*',schema:'public',table:'vote_settings'}, payload => {
-      const newSettings = payload.new;
-      const wasRunning = settings.timer_running;
-      const prevRemaining = localTimer;
-      
-      settings = newSettings;
-      applySettings();
+      settings = payload.new; applySettings();
     })
     .on('postgres_changes', {event:'*',schema:'public',table:'vote_items'}, async () => {
-      const { data } = await db.from('vote_items').select('*').order('sort_position');
+      const {data} = await db.from('vote_items').select('*').order('sort_position');
       if(data) { items = data; renderItems(); }
     })
     .subscribe();
