@@ -7,137 +7,123 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 
-body {
-  font-family: 'Noto Sans KR', sans-serif;
-  background: #0B0B15;
-  color: #fff;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  position: relative;
-  transition: background 0.8s;
+body{
+  font-family:'Noto Sans KR',sans-serif;
+  background:#0B0B15;
+  color:#fff;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  position:relative;
+  transition:background 0.8s;
 }
 
-/* BG ORBS */
-.bg-orbs {
-  position: fixed; inset: 0; pointer-events: none; z-index: 0;
-  transition: opacity 0.8s;
-}
-.orb {
-  position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.12;
-}
-.orb-1 { width: 500px; height: 500px; background: #7C3AED; top: -100px; left: -100px; animation: f1 12s infinite alternate ease-in-out; }
-.orb-2 { width: 400px; height: 400px; background: #3B82F6; bottom: -80px; right: -80px; animation: f2 10s infinite alternate ease-in-out; }
-.orb-3 { width: 300px; height: 300px; background: #EC4899; top: 50%; right: 20%; animation: f3 14s infinite alternate ease-in-out; }
-@keyframes f1 { 0%{transform:translate(0,0)} 100%{transform:translate(60px,40px)} }
-@keyframes f2 { 0%{transform:translate(0,0)} 100%{transform:translate(-40px,60px)} }
-@keyframes f3 { 0%{transform:translate(0,0)} 100%{transform:translate(30px,-50px)} }
+.bg-orbs{position:fixed;inset:0;pointer-events:none;z-index:0;transition:opacity .8s;}
+.orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.12;}
+.orb-1{width:500px;height:500px;background:#7C3AED;top:-100px;left:-100px;animation:f1 12s infinite alternate ease-in-out;}
+.orb-2{width:400px;height:400px;background:#3B82F6;bottom:-80px;right:-80px;animation:f2 10s infinite alternate ease-in-out;}
+.orb-3{width:300px;height:300px;background:#EC4899;top:50%;right:20%;animation:f3 14s infinite alternate ease-in-out;}
+@keyframes f1{0%{transform:translate(0,0)}100%{transform:translate(60px,40px)}}
+@keyframes f2{0%{transform:translate(0,0)}100%{transform:translate(-40px,60px)}}
+@keyframes f3{0%{transform:translate(0,0)}100%{transform:translate(30px,-50px)}}
 
-/* INACTIVE */
-.inactive-screen {
-  position: fixed; inset: 0;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  z-index: 10; background: rgba(0,0,0,0.88); transition: opacity 0.5s;
-}
-.inactive-screen.hidden { opacity: 0; pointer-events: none; }
-.inactive-icon { font-size: 56px; margin-bottom: 14px; opacity: 0.35; }
-.inactive-text { font-size: 22px; font-weight: 700; color: rgba(255,255,255,0.35); }
-.inactive-sub { font-size: 13px; color: rgba(255,255,255,0.2); margin-top: 8px; }
+.inactive{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;background:rgba(0,0,0,.9);transition:opacity .4s;}
+.inactive.hidden{opacity:0;pointer-events:none;}
+.inactive-icon{font-size:52px;margin-bottom:12px;opacity:.35;}
+.inactive-text{font-size:20px;font-weight:700;color:rgba(255,255,255,.35);}
+.inactive-sub{font-size:12px;color:rgba(255,255,255,.2);margin-top:6px;}
 
-/* MAIN CONTENT */
-.content {
-  position: relative; z-index: 5;
-  width: 100%; max-width: 920px; padding: 40px;
-  display: flex; flex-direction: column; align-items: center; gap: 28px;
-  opacity: 0; transition: opacity 0.6s;
+/* CONTENT WRAPPER — scaled by JS */
+.content{
+  position:relative;z-index:5;
+  width:100%;max-width:960px;
+  padding:40px;
+  display:flex;flex-direction:column;align-items:center;gap:0;
+  opacity:0;transition:opacity .5s;
 }
-.content.visible { opacity: 1; }
+.content.visible{opacity:1;}
 
-/* HEADER */
-.display-title {
-  font-weight: 900; line-height: 1.1; text-align: center;
-  text-shadow: 0 4px 30px rgba(0,0,0,0.5);
-  transition: all 0.4s;
+/* HEADER LAYOUT */
+.header-row{
+  width:100%;display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+  text-align:center;
+  margin-bottom:24px;
+  transition:all .4s;
 }
-.display-subtitle {
-  font-weight: 500; line-height: 1.4; text-align: center;
-  transition: all 0.4s;
+.header-row.layout-right{
+  flex-direction:row;
+  justify-content:center;
+  align-items:center;
+  text-align:left;
 }
+.header-texts{line-height:1.15;}
+.disp-title{
+  font-weight:900;
+  text-shadow:0 4px 30px rgba(0,0,0,.5);
+  transition:all .4s;
+  word-break:keep-all;
+}
+.disp-sub{font-weight:500;transition:all .4s;}
 
 /* TIMER */
-.timer-wrap {
-  display: flex; align-items: center; gap: 10px;
-  transition: all 0.4s; overflow: hidden;
+.timer-block{
+  display:flex;align-items:center;gap:8px;
+  transition:all .4s;
+  flex-shrink:0;
 }
-.timer-wrap.hidden-timer { max-height: 0; opacity: 0; pointer-events: none; margin: 0; }
-.t-grp { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-.t-lbl { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.4); letter-spacing: 0.15em; text-transform: uppercase; }
-.t-box {
-  background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.12);
-  border-radius: 16px; width: 80px; height: 88px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 48px; font-weight: 900; font-variant-numeric: tabular-nums;
-  letter-spacing: -2px; position: relative; overflow: hidden;
-  transition: all 0.3s;
+.timer-block.hidden-t{display:none;}
+.t-grp{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.t-lbl{font-size:10px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:.12em;text-transform:uppercase;}
+.t-box{
+  background:rgba(255,255,255,.05);
+  border:2px solid rgba(255,255,255,.12);
+  border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:-1px;
+  position:relative;overflow:hidden;transition:all .3s;
 }
-.t-box::before {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, transparent 100%);
-}
-.t-box.urgent { border-color: #EF4444; box-shadow: 0 0 30px rgba(239,68,68,0.4); animation: tshake 0.3s infinite; color: #EF4444; }
-.t-box.warning { border-color: #F59E0B; box-shadow: 0 0 20px rgba(245,158,11,0.3); color: #F59E0B; }
-.t-box.running { border-color: rgba(124,58,237,0.6); box-shadow: 0 0 20px rgba(124,58,237,0.3); }
-@keyframes tshake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-2px)} 75%{transform:translateX(2px)} }
-.t-sep { font-size: 40px; font-weight: 900; color: rgba(255,255,255,0.3); padding-bottom: 20px; animation: blink 1s infinite; }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.t-box::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.05) 0%,transparent 100%);}
+.t-box.urgent{border-color:#EF4444;box-shadow:0 0 28px rgba(239,68,68,.4);color:#EF4444;animation:tsh .28s infinite;}
+.t-box.warning{border-color:#F59E0B;box-shadow:0 0 18px rgba(245,158,11,.3);color:#F59E0B;}
+.t-box.running{border-color:rgba(124,58,237,.6);box-shadow:0 0 18px rgba(124,58,237,.3);}
+@keyframes tsh{0%,100%{transform:translateX(0)}25%{transform:translateX(-2px)}75%{transform:translateX(2px)}}
+.t-sep{font-weight:900;color:rgba(255,255,255,.3);animation:blink 1s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 
 /* ITEMS */
-.items-container { width: 100%; display: flex; flex-direction: column; gap: 12px; }
-.vote-item {
-  position: relative;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 16px; padding: 16px 20px;
-  backdrop-filter: blur(10px); overflow: hidden;
-  transition: all 0.4s;
+.items-wrap{width:100%;display:flex;flex-direction:column;}
+.vote-item{
+  position:relative;
+  border-radius:16px;padding:16px 20px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.08);
+  transition:all .4s;
 }
-.vote-item::before {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 60%);
-}
-.item-bg-fill {
-  position: absolute; top:0; left:0; bottom:0;
-  border-radius: 16px; opacity: 0.1;
-  transition: width 0.8s cubic-bezier(0.34,1.56,0.64,1);
-}
-.item-content { position: relative; z-index: 2; display: flex; align-items: center; gap: 14px; }
-.item-rank {
-  width: 36px; height: 36px; border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 900; font-size: 14px; flex-shrink: 0;
-}
-.item-info { flex: 1; }
-.item-label { font-size: 18px; font-weight: 700; margin-bottom: 2px; }
-.item-desc { font-size: 12px; color: rgba(255,255,255,0.5); }
-.item-right { text-align: right; flex-shrink: 0; }
-.item-count { font-size: 32px; font-weight: 900; letter-spacing: -1px; }
-.item-pct { font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 2px; }
-.item-bar-wrap { margin-top: 10px; position: relative; height: 5px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
-.item-bar { position: absolute; top:0;left:0;bottom:0; border-radius: 3px; transition: width 0.8s cubic-bezier(0.34,1.56,0.64,1); }
-.vote-item.lead { border-color: rgba(255,255,255,0.2); }
-@keyframes flash { 0%{background:rgba(255,255,255,0.14)} 100%{background:rgba(255,255,255,0.04)} }
-.vote-item.updated { animation: flash 0.5s ease-out; }
+.vote-item::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.03) 0%,transparent 60%);pointer-events:none;}
+.item-bg-fill{position:absolute;top:0;left:0;bottom:0;border-radius:16px;transition:width .8s cubic-bezier(.34,1.56,.64,1);}
+.item-content{position:relative;z-index:2;display:flex;align-items:center;gap:14px;}
+.item-rank{border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;flex-shrink:0;}
+.item-info{flex:1;}
+.item-label{font-weight:700;}
+.item-desc{color:rgba(255,255,255,.5);}
+.item-right{text-align:right;flex-shrink:0;}
+.item-count{font-weight:900;letter-spacing:-1px;}
+.item-pct{color:rgba(255,255,255,.5);}
+.item-bar-wrap{position:relative;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;}
+.item-bar{position:absolute;top:0;left:0;bottom:0;border-radius:3px;transition:width .8s cubic-bezier(.34,1.56,.64,1);}
+.vote-item.lead{border-color:rgba(255,255,255,.2);}
+@keyframes flash{0%{background:rgba(255,255,255,.14)}100%{background:inherit}}
+.vote-item.updated{animation:flash .5s ease-out;}
 
-.watermark {
-  position: fixed; bottom: 14px; right: 14px;
-  font-size: 11px; color: rgba(255,255,255,0.15); z-index: 10;
-  letter-spacing: 0.1em;
-}
+.wm{position:fixed;bottom:12px;right:12px;font-size:10px;color:rgba(255,255,255,.12);z-index:10;letter-spacing:.1em;}
 </style>
 </head>
 <body>
@@ -148,199 +134,232 @@ body {
   <div class="orb orb-3"></div>
 </div>
 
-<div class="inactive-screen" id="inactive-screen">
+<div class="inactive" id="inactive">
   <div class="inactive-icon">⏳</div>
   <div class="inactive-text">진행 중이 아닙니다</div>
-  <div class="inactive-sub">관리자가 투표를 시작하면 여기에 표시됩니다</div>
+  <div class="inactive-sub">관리자가 투표를 시작하면 표시됩니다</div>
 </div>
 
-<div class="content" id="main-content">
-  <div style="text-align:center">
-    <div class="display-title" id="display-title">🎯 라이브 투표</div>
-    <div class="display-subtitle" id="display-subtitle" style="margin-top:8px">지금 바로 투표하세요!</div>
-  </div>
-
-  <div class="timer-wrap" id="timer-wrap">
-    <div class="t-grp">
-      <div class="t-lbl">분</div>
-      <div class="t-box" id="t-min">00</div>
+<div class="content" id="content">
+  <div class="header-row" id="header-row">
+    <div class="header-texts">
+      <div class="disp-title" id="d-title">🎯 라이브 투표</div>
+      <div class="disp-sub" id="d-sub" style="margin-top:6px">지금 바로 투표하세요!</div>
     </div>
-    <div class="t-sep">:</div>
-    <div class="t-grp">
-      <div class="t-lbl">초</div>
-      <div class="t-box" id="t-sec">00</div>
+    <div class="timer-block" id="timer-block">
+      <div class="t-grp"><div class="t-lbl">분</div><div class="t-box" id="t-min">00</div></div>
+      <div class="t-sep" id="t-sep">:</div>
+      <div class="t-grp"><div class="t-lbl">초</div><div class="t-box" id="t-sec">00</div></div>
     </div>
   </div>
-
-  <div class="items-container" id="items-container"></div>
+  <div class="items-wrap" id="items-wrap"></div>
 </div>
 
-<div class="watermark">LIVE VOTE</div>
+<div class="wm">LIVE VOTE</div>
 
 <script>
-const SUPABASE_URL = 'https://ayizwqajaoqmjyhkcgcb.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5aXp3cWFqYW9xbWp5aGtjZ2NiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MDg5NzUsImV4cCI6MjA5MjE4NDk3NX0.SbvUfjmBL0eFO3Bv4F3YEw12qfG65iIMPbWy919T3fo';
-const { createClient } = supabase;
-const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+const SURL='https://ayizwqajaoqmjyhkcgcb.supabase.co';
+const SKEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5aXp3cWFqYW9xbWp5aGtjZ2NiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2MDg5NzUsImV4cCI6MjA5MjE4NDk3NX0.SbvUfjmBL0eFO3Bv4F3YEw12qfG65iIMPbWy919T3fo';
+const{createClient}=supabase;
+const db=createClient(SURL,SKEY);
 
-let settings = {}, items = [], localTimer = 0, timerInterval = null, lastVoteCounts = {};
+let S={},items=[],localTimer=0,tInt=null,lastCounts={};
 
-async function loadAll() {
-  const [{data:s},{data:i}] = await Promise.all([
+async function loadAll(){
+  const[{data:s},{data:i}]=await Promise.all([
     db.from('vote_settings').select('*').eq('id','00000000-0000-0000-0000-000000000001').single(),
     db.from('vote_items').select('*').order('sort_position')
   ]);
-  if(s) { settings = s; applySettings(); }
-  if(i) { items = i; renderItems(); }
+  if(s){S=s;applyS();}
+  if(i){items=i;renderItems();}
 }
 
-function applySettings() {
-  const t = document.getElementById('display-title');
-  const s = document.getElementById('display-subtitle');
-  const body = document.body;
-  const orbs = document.getElementById('bg-orbs');
-  const inactive = document.getElementById('inactive-screen');
-  const content = document.getElementById('main-content');
-  const timerWrap = document.getElementById('timer-wrap');
-
-  t.textContent = settings.title || '🎯 라이브 투표';
-  t.style.color = settings.title_color || '#FFFFFF';
-  t.style.fontSize = (settings.title_size || 48) + 'px';
-
-  s.textContent = settings.subtitle || '지금 바로 투표하세요!';
-  s.style.color = settings.subtitle_color || '#A78BFA';
-  s.style.fontSize = (settings.subtitle_size || 24) + 'px';
+function applyS(){
+  const body=document.body;
+  const orbs=document.getElementById('bg-orbs');
+  const inactive=document.getElementById('inactive');
+  const content=document.getElementById('content');
+  const hRow=document.getElementById('header-row');
+  const tb=document.getElementById('timer-block');
+  const titleEl=document.getElementById('d-title');
+  const subEl=document.getElementById('d-sub');
 
   // Background
-  body.style.background = settings.bg_color || '#0B0B15';
-  orbs.style.opacity = settings.bg_effect !== false ? '1' : '0';
+  body.style.background=S.bg_color||'#0B0B15';
+  orbs.style.opacity=S.bg_effect!==false?'1':'0';
 
   // Active
-  if(settings.is_active) {
-    inactive.classList.add('hidden');
-    content.classList.add('visible');
-  } else {
-    inactive.classList.remove('hidden');
-    content.classList.remove('visible');
-  }
+  inactive.classList.toggle('hidden',!!S.is_active);
+  content.classList.toggle('visible',!!S.is_active);
 
-  // Timer visibility
-  const timerVis = settings.timer_visible !== false;
-  timerWrap.classList.toggle('hidden-timer', !timerVis);
+  // Scale
+  const scale=(S.display_scale||100)/100;
+  content.style.transform=`scale(${scale})`;
+  content.style.transformOrigin='center center';
 
-  // Timer value
-  localTimer = settings.timer_remaining ?? 0;
-  renderTimer(localTimer);
-  clearInterval(timerInterval); timerInterval = null;
-  if(settings.timer_running && localTimer > 0 && timerVis) {
-    timerInterval = setInterval(() => {
-      if(localTimer > 0) { localTimer--; renderTimer(localTimer); }
-      else clearInterval(timerInterval);
-    }, 1000);
-  }
-}
+  // Title / Sub
+  titleEl.textContent=S.title||'🎯 라이브 투표';
+  titleEl.style.color=S.title_color||'#FFFFFF';
+  titleEl.style.fontSize=(S.title_size||48)+'px';
+  subEl.textContent=S.subtitle||'지금 바로 투표하세요!';
+  subEl.style.color=S.subtitle_color||'#A78BFA';
+  subEl.style.fontSize=(S.subtitle_size||24)+'px';
+  subEl.style.marginTop=S.timer_layout==='right'?'4px':'6px';
 
-function renderTimer(secs) {
-  const m = Math.floor(secs/60), s = secs%60;
-  document.getElementById('t-min').textContent = String(m).padStart(2,'0');
-  document.getElementById('t-sec').textContent = String(s).padStart(2,'0');
-  document.querySelectorAll('.t-box').forEach(b => {
-    b.classList.remove('urgent','warning','running');
-    if(secs<=10) b.classList.add('urgent');
-    else if(secs<=30) b.classList.add('warning');
-    else if(settings.timer_running) b.classList.add('running');
+  // Timer layout
+  const tl=S.timer_layout||'below';
+  hRow.className='header-row'+(tl==='right'?' layout-right':'');
+
+  // Timer size (proportional)
+  const tsz=Math.max(28, Math.round(48*scale));
+  document.querySelectorAll('.t-box').forEach(b=>{
+    b.style.width=tsz+'px';b.style.height=(tsz+8)+'px';b.style.fontSize=(tsz*.6)+'px';b.style.borderRadius=(tsz*.25)+'px';
   });
-  const sep = document.getElementById('timer-wrap').querySelector('.t-sep');
-  if(sep) sep.style.animationPlayState = settings.timer_running ? 'running' : 'paused';
+  const sep=document.getElementById('t-sep');
+  if(sep){sep.style.fontSize=(tsz*.55)+'px';sep.style.marginBottom=(tsz*.3)+'px';}
+
+  // Timer visible
+  const tv=S.timer_visible!==false;
+  tb.classList.toggle('hidden-t',!tv);
+
+  // Timer value & run
+  localTimer=S.timer_remaining??0;
+  renderTimer(localTimer);
+  clearInterval(tInt);tInt=null;
+  if(S.timer_running&&localTimer>0&&tv){
+    tInt=setInterval(()=>{
+      if(localTimer>0){localTimer--;renderTimer(localTimer);}
+      else clearInterval(tInt);
+    },1000);
+  }
+  if(sep)sep.style.animationPlayState=S.timer_running?'running':'paused';
+
+  renderItems();
 }
 
-function getSortedItems() {
-  const s = [...items];
-  if(settings.sort_order==='desc') s.sort((a,b)=>b.vote_count-a.vote_count);
-  else if(settings.sort_order==='asc') s.sort((a,b)=>a.vote_count-b.vote_count);
-  else s.sort((a,b)=>a.sort_position-b.sort_position);
-  return s;
+function renderTimer(secs){
+  const m=Math.floor(secs/60),s=secs%60;
+  document.getElementById('t-min').textContent=String(m).padStart(2,'0');
+  document.getElementById('t-sec').textContent=String(s).padStart(2,'0');
+  document.querySelectorAll('.t-box').forEach(b=>{
+    b.classList.remove('urgent','warning','running');
+    if(secs<=10)b.classList.add('urgent');
+    else if(secs<=30)b.classList.add('warning');
+    else if(S.timer_running)b.classList.add('running');
+  });
 }
 
-function renderItems() {
-  const container = document.getElementById('items-container');
-  const sorted = getSortedItems();
-  const total = sorted.reduce((a,b)=>a+b.vote_count,0);
-  const showNumbers = settings.show_numbers !== false;
-  if(!sorted.length) {
-    container.innerHTML = '<div style="text-align:center;color:rgba(255,255,255,0.3);padding:40px">투표 항목 없음</div>';
+function getSorted(){
+  const a=[...items];
+  if(S.sort_order==='desc')a.sort((x,y)=>y.vote_count-x.vote_count);
+  else if(S.sort_order==='asc')a.sort((x,y)=>x.vote_count-y.vote_count);
+  else a.sort((x,y)=>x.sort_position-y.sort_position);
+  return a;
+}
+
+function renderItems(){
+  const wrap=document.getElementById('items-wrap');
+  const sorted=getSorted();
+  const total=sorted.reduce((a,b)=>a+b.vote_count,0);
+  const showNums=S.show_numbers!==false;
+  const scale=(S.display_scale||100)/100;
+  const opacity=(S.item_opacity??30)/100;
+
+  // Gap between items
+  wrap.style.gap=Math.round(10*scale)+'px';
+
+  if(!sorted.length){
+    wrap.innerHTML='<div style="text-align:center;color:rgba(255,255,255,.25);padding:40px;font-size:16px">투표 항목이 없습니다</div>';
     return;
   }
-  const maxCount = Math.max(...sorted.map(i=>i.vote_count),1);
+  const maxC=Math.max(...sorted.map(i=>i.vote_count),1);
 
-  sorted.forEach((item,idx) => {
-    const pct = total>0?Math.round(item.vote_count/total*100):0;
-    const barPct = Math.round(item.vote_count/maxCount*100);
-    const isLead = idx===0 && item.vote_count>0;
-    const wasUpdated = lastVoteCounts[item.id]!==undefined && lastVoteCounts[item.id]!==item.vote_count;
+  sorted.forEach((item,idx)=>{
+    const pct=total>0?Math.round(item.vote_count/total*100):0;
+    const barPct=Math.round(item.vote_count/maxC*100);
+    const isLead=idx===0&&item.vote_count>0;
+    const wasUpdated=lastCounts[item.id]!==undefined&&lastCounts[item.id]!==item.vote_count;
 
-    let el = document.getElementById('item-'+item.id);
-    if(!el) {
-      el = document.createElement('div');
-      el.id = 'item-'+item.id;
-      el.className = 'vote-item';
-      el.innerHTML = `
-        <div class="item-bg-fill" id="bg-${item.id}"></div>
-        <div class="item-content">
-          ${showNumbers?`<div class="item-rank" id="rank-${item.id}" style="background:${item.color}22;color:${item.color}">${idx+1}</div>`:''}
+    let el=document.getElementById('item-'+item.id);
+    const itemBg=`rgba(255,255,255,${opacity})`;
+    const rankSize=Math.round(32*scale);
+    const barH=Math.round(5*scale);
+    const pad=Math.round(14*scale);
+
+    if(!el){
+      el=document.createElement('div');
+      el.id='item-'+item.id;
+      el.className='vote-item';
+      wrap.appendChild(el);
+    }
+
+    el.style.background=itemBg;
+    el.style.padding=pad+'px '+Math.round(18*scale)+'px';
+    el.style.marginBottom=Math.round(8*scale)+'px';
+
+    const existBg=document.getElementById('ib-'+item.id);
+    const existContent=document.getElementById('ic-'+item.id);
+    const existBar=document.getElementById('ibar-'+item.id);
+    const existBgFill=document.getElementById('ibf-'+item.id);
+
+    if(!existContent){
+      el.innerHTML=`
+        <div class="item-bg-fill" id="ibf-${item.id}"></div>
+        <div class="item-content" id="ic-${item.id}">
+          ${showNums?`<div class="item-rank" id="irk-${item.id}" style="width:${rankSize}px;height:${rankSize}px;font-size:${Math.round(13*scale)}px;background:${item.color}22;color:${item.color}">${idx+1}</div>`:''}
           <div class="item-info">
-            <div class="item-label">${item.label}</div>
-            ${item.description?`<div class="item-desc">${item.description}</div>`:''}
+            <div class="item-label" id="ilbl-${item.id}" style="font-size:${Math.round(16*scale)}px">${item.label}</div>
+            ${item.description?`<div class="item-desc" style="font-size:${Math.round(11*scale)}px">${item.description}</div>`:''}
           </div>
           <div class="item-right">
-            <div class="item-count" id="count-${item.id}" style="color:${item.color}">${item.vote_count}</div>
-            <div class="item-pct" id="pct-${item.id}">${pct}%</div>
+            <div class="item-count" id="icnt-${item.id}" style="font-size:${Math.round(30*scale)}px;color:${item.color}">${item.vote_count}</div>
+            <div class="item-pct" id="ipct-${item.id}" style="font-size:${Math.round(12*scale)}px">${pct}%</div>
           </div>
         </div>
-        <div class="item-bar-wrap"><div class="item-bar" id="bar-${item.id}" style="background:${item.color};width:${barPct}%"></div></div>
-      `;
-      container.appendChild(el);
-    } else {
-      const countEl = document.getElementById('count-'+item.id);
-      const pctEl = document.getElementById('pct-'+item.id);
-      const barEl = document.getElementById('bar-'+item.id);
-      const rankEl = document.getElementById('rank-'+item.id);
-      if(countEl) { countEl.textContent = item.vote_count; countEl.style.color = item.color; }
-      if(pctEl) pctEl.textContent = pct+'%';
-      if(barEl) { barEl.style.width = barPct+'%'; barEl.style.background = item.color; }
-      if(rankEl) rankEl.textContent = idx+1;
+        <div class="item-bar-wrap" style="margin-top:${Math.round(9*scale)}px;height:${barH}px">
+          <div class="item-bar" id="ibar-${item.id}" style="background:${item.color};width:${barPct}%"></div>
+        </div>`;
+    }else{
+      const cnt=document.getElementById('icnt-'+item.id);
+      const pctEl=document.getElementById('ipct-'+item.id);
+      const bar=document.getElementById('ibar-'+item.id);
+      const rnk=document.getElementById('irk-'+item.id);
+      const bgf=document.getElementById('ibf-'+item.id);
+      if(cnt){cnt.textContent=item.vote_count;cnt.style.color=item.color;cnt.style.fontSize=Math.round(30*scale)+'px';}
+      if(pctEl)pctEl.textContent=pct+'%';
+      if(bar){bar.style.width=barPct+'%';bar.style.background=item.color;}
+      if(rnk){rnk.textContent=idx+1;rnk.style.width=rankSize+'px';rnk.style.height=rankSize+'px';rnk.style.fontSize=Math.round(13*scale)+'px';}
+      if(bgf){bgf.style.background=item.color;bgf.style.width=barPct+'%';}
+      // label size
+      const lbl=document.getElementById('ilbl-'+item.id);
+      if(lbl)lbl.style.fontSize=Math.round(16*scale)+'px';
     }
 
-    const bgEl = document.getElementById('bg-'+item.id);
-    if(bgEl) { bgEl.style.background = item.color; bgEl.style.width = barPct+'%'; }
+    const bgf2=document.getElementById('ibf-'+item.id);
+    if(bgf2){bgf2.style.background=item.color;bgf2.style.width=barPct+'%';}
 
-    el.classList.toggle('lead', isLead);
-    if(wasUpdated) {
-      el.classList.add('updated');
-      setTimeout(()=>el.classList.remove('updated'),500);
-    }
-    lastVoteCounts[item.id] = item.vote_count;
-    container.appendChild(el);
+    el.classList.toggle('lead',isLead);
+    if(wasUpdated){el.classList.add('updated');setTimeout(()=>el.classList.remove('updated'),500);}
+    lastCounts[item.id]=item.vote_count;
+    wrap.appendChild(el);
   });
 
-  // Remove deleted items
-  const ids = sorted.map(i=>'item-'+i.id);
-  container.querySelectorAll('.vote-item').forEach(el => { if(!ids.includes(el.id)) el.remove(); });
+  // Remove deleted
+  const ids=sorted.map(i=>'item-'+i.id);
+  wrap.querySelectorAll('.vote-item').forEach(el=>{if(!ids.includes(el.id))el.remove();});
 }
 
-function setupRealtime() {
-  db.channel('display-rt-v2')
-    .on('postgres_changes', {event:'*',schema:'public',table:'vote_settings'}, payload => {
-      settings = payload.new; applySettings();
-    })
-    .on('postgres_changes', {event:'*',schema:'public',table:'vote_items'}, async () => {
-      const {data} = await db.from('vote_items').select('*').order('sort_position');
-      if(data) { items = data; renderItems(); }
+function setupRT(){
+  db.channel('display-rt-v3')
+    .on('postgres_changes',{event:'*',schema:'public',table:'vote_settings'},payload=>{S=payload.new;applyS();})
+    .on('postgres_changes',{event:'*',schema:'public',table:'vote_items'},async()=>{
+      const{data}=await db.from('vote_items').select('*').order('sort_position');
+      if(data){items=data;renderItems();}
     })
     .subscribe();
 }
 
-loadAll().then(setupRealtime);
+loadAll().then(setupRT);
 </script>
 </body>
 </html>
