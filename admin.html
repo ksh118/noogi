@@ -425,9 +425,26 @@ hr{border:none;border-top:1px solid var(--border);margin:12px 0;}
               <div class="slrow"><input type="range" id="d-ss" min="10" max="72" value="24" oninput="document.getElementById('d-ss-v').textContent=this.value+'px';setS('subtitle_size',+this.value);rPrev()"></div>
             </div>
           </div>
-          <div class="fg" style="margin-bottom:0">
+          <div class="fg">
             <label class="fl">항목 글자 크기 <span id="d-ifs-v" style="color:var(--text);font-weight:800">16px</span></label>
             <div class="slrow"><input type="range" id="d-ifs" min="10" max="48" value="16" oninput="document.getElementById('d-ifs-v').textContent=this.value+'px';setS('item_font_size',+this.value);rPrev()"></div>
+          </div>
+          <div class="fg" style="margin-bottom:0">
+            <label class="fl">오른쪽 숫자 크기 <span id="d-cfs-v" style="color:var(--text);font-weight:800">30px</span></label>
+            <div class="slrow"><input type="range" id="d-cfs" min="12" max="72" value="30" oninput="document.getElementById('d-cfs-v').textContent=this.value+'px';setS('count_font_size',+this.value);rPrev()"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="chd">⬜ 2열 레이아웃</div>
+          <div class="fg" style="margin-bottom:0">
+            <label class="fl">2열 전환 기준 항목 수</label>
+            <div class="fhint" style="margin-bottom:6px">이 숫자 이상이 되면 항목이 좌우 2열로 배치됩니다</div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input class="adj" type="number" id="d-cb" value="8" min="2" max="50" style="width:72px">
+              <span style="font-size:11px;color:var(--text2)">개 이상 시 2열</span>
+              <button class="btn btn-pri btn-sm" onclick="saveColBreak()">적용</button>
+            </div>
           </div>
         </div>
       </div>
@@ -621,6 +638,8 @@ function applyS(){
   c2('d-ic','d-ict',S.item_text_color||'#FFFFFF');
   c2('d-cc','d-cct',S.count_color||'#2F80ED');
   slSet('d-ifs',S.item_font_size||16,'d-ifs-v','px');
+  slSet('d-cfs',S.count_font_size||30,'d-cfs-v','px');
+  sv('d-cb',S.col_break||8);
   ck('tog-tv',S.timer_visible!==false);
   ck('tog-fx',S.bg_effect!==false);
   ck('tog-num',S.show_numbers!==false);
@@ -789,6 +808,11 @@ async function resetCountColor(){
   await db.from('vote_settings').update({count_color:null,updated_at:new Date().toISOString()}).eq('id',SID);
   S.count_color=null;c2('d-cc','d-cct','#2F80ED');rPrev();
   toast('항목 고유 색상으로 복원','grn');
+}
+async function saveColBreak(){
+  const v=parseInt(document.getElementById('d-cb').value)||8;
+  await setS('col_break',v);
+  toast('2열 기준: '+v+'개로 저장','grn');
 }
 
 // ── Free mode ─────────────────────────────────────────────
