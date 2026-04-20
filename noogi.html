@@ -17,8 +17,9 @@ body{
   display:flex;
   flex-direction:column;
   align-items:center;
-  justify-content:center;
-  overflow:hidden;
+  justify-content:flex-start;
+  overflow-y:auto;
+  overflow-x:hidden;
   position:relative;
   transition:background 0.8s;
 }
@@ -41,7 +42,8 @@ body{
 .content{
   position:relative;z-index:5;
   width:100%;max-width:960px;
-  padding:40px;
+  padding:18px 40px 40px;
+  margin-top:-20px;
   display:flex;flex-direction:column;align-items:center;gap:0;
   opacity:0;transition:opacity .5s;
 }
@@ -220,7 +222,10 @@ function applyS(){
 
   const scale=(S.display_scale||100)/100;
   content.style.transform=`scale(${scale})`;
-  content.style.transformOrigin='center center';
+  content.style.transformOrigin='top center';
+  // Expand body to accommodate scaled content so it's scrollable
+  const naturalH=content.scrollHeight||600;
+  document.body.style.minHeight=Math.ceil(naturalH*scale+80)+'px';
 
   titleEl.textContent=S.title||'🎯 라이브 투표';
   titleEl.style.color=S.title_color||'#FFFFFF';
@@ -297,7 +302,7 @@ function renderItems(){
   wrap.style.gap=Math.round(10*scale)+'px';
 
   if(!sorted.length){
-    wrap.innerHTML='<div style="text-align:center;color:rgba(255,255,255,.25);padding:40px;font-size:16px">투표 항목이 없습니다</div>';
+    wrap.innerHTML='';
     return;
   }
   const maxC=Math.max(...sorted.map(i=>i.vote_count),1);
@@ -367,6 +372,15 @@ function renderItems(){
   // Remove deleted items
   const ids=sorted.map(i=>'item-'+i.id);
   wrap.querySelectorAll('.vote-item').forEach(el=>{if(!ids.includes(el.id))el.remove();});
+
+  // Recalculate scrollable height after render
+  const content=document.getElementById('content');
+  if(content){
+    const sc=(S.display_scale||100)/100;
+    requestAnimationFrame(()=>{
+      document.body.style.minHeight=Math.ceil(content.scrollHeight*sc+120)+'px';
+    });
+  }
 }
 
 // ── Realtime — comprehensive subscription ─────────────────────
