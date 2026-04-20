@@ -118,11 +118,11 @@ body{
   box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.15);
 }
 .item-info{flex:1;}
-.item-label{font-weight:700;}
-.item-desc{color:rgba(255,255,255,.5);}
+.item-label{font-weight:900;text-shadow:0 1px 4px rgba(0,0,0,.7),0 0 12px rgba(0,0,0,.5);letter-spacing:-.01em;}
+.item-desc{color:rgba(255,255,255,.6);text-shadow:0 1px 3px rgba(0,0,0,.6);}
 .item-right{text-align:right;flex-shrink:0;}
-.item-count{font-weight:900;letter-spacing:-1px;}
-.item-pct{color:rgba(255,255,255,.5);}
+.item-count{font-weight:900;letter-spacing:-1px;text-shadow:0 1px 6px rgba(0,0,0,.6);}
+.item-pct{font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.6);}
 .item-bar-wrap{position:relative;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;}
 .item-bar{position:absolute;top:0;left:0;bottom:0;border-radius:3px;transition:width .8s cubic-bezier(.34,1.56,.64,1);}
 .vote-item.lead{border-color:rgba(255,255,255,.2);}
@@ -291,6 +291,8 @@ function renderItems(){
   // Use admin-set item_text_color or auto-compute based on opacity
   const hasOverride=!!S.item_text_color;
   const autoTxtColor=itemTextColor(bgColor,opacity,hasOverride?S.item_text_color:null);
+  const itemFontSize=S.item_font_size||16;
+  const countColor=S.count_color||null;
 
   wrap.style.gap=Math.round(10*scale)+'px';
 
@@ -330,16 +332,16 @@ function renderItems(){
         <div class="item-content" id="ic-${item.id}">
           ${showNums?`<div class="item-rank" id="irk-${item.id}" style="width:${rankSize}px;height:${rankSize}px;font-size:${Math.round(13*scale)}px;">${idx+1}</div>`:''}
           <div class="item-info">
-            <div class="item-label" id="ilbl-${item.id}" style="font-size:${Math.round(16*scale)}px;color:${autoTxtColor}">${item.label}</div>
+            <div class="item-label" id="ilbl-${item.id}" style="font-size:${Math.round(itemFontSize*scale)}px;color:${autoTxtColor}">${item.label}</div>
             ${item.description?`<div class="item-desc" style="font-size:${Math.round(11*scale)}px">${item.description}</div>`:''}
           </div>
           <div class="item-right">
-            <div class="item-count" id="icnt-${item.id}" style="font-size:${Math.round(30*scale)}px;color:${item.color}">${item.vote_count}</div>
-            <div class="item-pct" id="ipct-${item.id}" style="font-size:${Math.round(12*scale)}px">${pct}%</div>
+            <div class="item-count" id="icnt-${item.id}" style="font-size:${Math.round(30*scale)}px;color:${countColor||item.color}">${item.vote_count}</div>
+            <div class="item-pct" id="ipct-${item.id}" style="font-size:${Math.round(12*scale)}px;color:${countColor||'rgba(255,255,255,.7)'}">${pct}%</div>
           </div>
         </div>
         <div class="item-bar-wrap" style="margin-top:${Math.round(9*scale)}px;height:${barH}px">
-          <div class="item-bar" id="ibar-${item.id}" style="background:${item.color};width:${barPct}%"></div>
+          <div class="item-bar" id="ibar-${item.id}" style="background:${countColor||item.color};width:${barPct}%"></div>
         </div>`;
     }else{
       const cnt=document.getElementById('icnt-'+item.id);
@@ -348,12 +350,12 @@ function renderItems(){
       const rnk=document.getElementById('irk-'+item.id);
       const bgf=document.getElementById('ibf-'+item.id);
       const lbl=document.getElementById('ilbl-'+item.id);
-      if(cnt){cnt.textContent=item.vote_count;cnt.style.color=item.color;cnt.style.fontSize=Math.round(30*scale)+'px';}
-      if(pctEl)pctEl.textContent=pct+'%';
-      if(bar){bar.style.width=barPct+'%';bar.style.background=item.color;}
+      if(cnt){cnt.textContent=item.vote_count;cnt.style.color=countColor||item.color;cnt.style.fontSize=Math.round(30*scale)+'px';}
+      if(pctEl){pctEl.textContent=pct+'%';pctEl.style.color=countColor||'rgba(255,255,255,.7)';}
+      if(bar){bar.style.width=barPct+'%';bar.style.background=countColor||item.color;}
       if(rnk){rnk.textContent=idx+1;rnk.style.width=rankSize+'px';rnk.style.height=rankSize+'px';rnk.style.fontSize=Math.round(13*scale)+'px';}
-      if(bgf){bgf.style.background=item.color;bgf.style.width=barPct+'%';}
-      if(lbl){lbl.style.color=autoTxtColor;lbl.style.fontSize=Math.round(16*scale)+'px';}
+      if(bgf){bgf.style.background=countColor||item.color;bgf.style.width=barPct+'%';}
+      if(lbl){lbl.style.color=autoTxtColor;lbl.style.fontSize=Math.round(itemFontSize*scale)+'px';}
     }
 
     el.classList.toggle('lead',isLead);
