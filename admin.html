@@ -402,6 +402,15 @@ hr{border:none;border-top:1px solid var(--border);margin:12px 0;}
             </div>
             <div class="fhint">불투명도 높을 때 자동 버튼으로 최적 색상 적용</div>
           </div>
+          <div class="fg" style="margin-top:10px;margin-bottom:0">
+            <label class="fl">투표수 · 바 · % 색상</label>
+            <div class="crow">
+              <input type="color" id="d-cc" value="#2F80ED" oninput="sc('d-cc','d-cct');setS('count_color',this.value);rPrev()">
+              <input class="fi" type="text" id="d-cct" value="#2F80ED" oninput="sc('d-cct','d-cc');setS('count_color',this.value);rPrev()">
+              <button class="btn btn-def btn-sm" onclick="resetCountColor()" style="white-space:nowrap">↩ 항목색</button>
+            </div>
+            <div class="fhint">각 항목 고유 색 대신 전체 통일 색상 적용 · '항목색' 버튼으로 원래대로</div>
+          </div>
         </div>
 
         <div class="card">
@@ -415,6 +424,10 @@ hr{border:none;border-top:1px solid var(--border);margin:12px 0;}
               <label class="fl">부제목 크기 <span id="d-ss-v" style="color:var(--text);font-weight:800">24px</span></label>
               <div class="slrow"><input type="range" id="d-ss" min="10" max="72" value="24" oninput="document.getElementById('d-ss-v').textContent=this.value+'px';setS('subtitle_size',+this.value);rPrev()"></div>
             </div>
+          </div>
+          <div class="fg" style="margin-bottom:0">
+            <label class="fl">항목 글자 크기 <span id="d-ifs-v" style="color:var(--text);font-weight:800">16px</span></label>
+            <div class="slrow"><input type="range" id="d-ifs" min="10" max="48" value="16" oninput="document.getElementById('d-ifs-v').textContent=this.value+'px';setS('item_font_size',+this.value);rPrev()"></div>
           </div>
         </div>
       </div>
@@ -504,9 +517,9 @@ hr{border:none;border-top:1px solid var(--border);margin:12px 0;}
 </main>
 
 <!-- ADD/EDIT MODAL -->
-<div class="mo" id="item-modal" onclick="closeIM()">
-  <div class="mo-in" onclick="e=>e.stopPropagation()">
-    <div class="mo-t" id="im-t">항목 추가</div>
+<div class="mo" id="item-modal">
+  <div class="mo-in" onclick="event.stopPropagation()">
+    <div class="mo-t" id="im-t" style="display:flex;align-items:center;justify-content:space-between;">항목 추가<button class="btn btn-ghost btn-sm" onclick="closeIM()" style="font-size:16px;padding:0 4px">✕</button></div>
     <div class="fg"><label class="fl">항목명 *</label><input class="fi" type="text" id="im-lb" placeholder="예: 팀 A" onkeydown="if(event.key==='Enter')saveItem()"></div>
     <div class="fg"><label class="fl">설명 (선택)</label><input class="fi" type="text" id="im-dc" placeholder="짧은 설명..."></div>
     <div class="fg">
@@ -606,6 +619,8 @@ function applyS(){
   c2('d-sc','d-sct',S.subtitle_color||'#A78BFA');
   c2('d-bg','d-bgt',S.bg_color||'#0B0B15');
   c2('d-ic','d-ict',S.item_text_color||'#FFFFFF');
+  c2('d-cc','d-cct',S.count_color||'#2F80ED');
+  slSet('d-ifs',S.item_font_size||16,'d-ifs-v','px');
   ck('tog-tv',S.timer_visible!==false);
   ck('tog-fx',S.bg_effect!==false);
   ck('tog-num',S.show_numbers!==false);
@@ -760,7 +775,7 @@ function getLum(r,g,b){
   const a=[r,g,b].map(v=>{v/=255;return v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4);});
   return 0.2126*a[0]+0.7152*a[1]+0.0722*a[2];
 }
-function autoItemTextColor(){
+async function autoItemTextColor(){
   const bg=hexToRgb(S.bg_color||'#0B0B15');
   const op=(S.item_opacity??30)/100;
   const br=Math.round(bg.r*(1-op)+255*op);
@@ -769,6 +784,11 @@ function autoItemTextColor(){
   const tc=getLum(br,bg2,bb)>0.35?'#1A1917':'#FFFFFF';
   c2('d-ic','d-ict',tc);setS('item_text_color',tc);rPrev();
   toast('글자색 자동 적용: '+tc,'grn');
+}
+async function resetCountColor(){
+  await db.from('vote_settings').update({count_color:null,updated_at:new Date().toISOString()}).eq('id',SID);
+  S.count_color=null;c2('d-cc','d-cct','#2F80ED');rPrev();
+  toast('항목 고유 색상으로 복원','grn');
 }
 
 // ── Free mode ─────────────────────────────────────────────
@@ -922,6 +942,7 @@ function openEM(id){
   setTimeout(()=>document.getElementById('im-lb').focus(),50);
 }
 function closeIM(){document.getElementById('item-modal').classList.remove('on');}
+document.getElementById('item-modal').addEventListener('click',function(e){if(e.target===this)closeIM();});
 function setMC(c){document.getElementById('im-c').value=c;document.getElementById('im-ct').value=c;}
 async function saveItem(){
   const label=document.getElementById('im-lb').value.trim();
@@ -1028,6 +1049,8 @@ function rPrev(){
     const ts=S.title_size||48,ss=S.subtitle_size||24;
     const scale=(S.display_scale||100)/100,opacity=(S.item_opacity??30)/100;
     const tl=S.timer_layout||'below',timerVis=S.timer_visible!==false;
+    const itemFS=S.item_font_size||16;
+    const cc=S.count_color||null;
     const sorted=getSorted().slice(0,4);
     const total=sorted.reduce((a,b)=>a+b.vote_count,0);
     const maxC=Math.max(...sorted.map(i=>i.vote_count),1);
@@ -1047,11 +1070,11 @@ function rPrev(){
       return`<div style="background:rgba(255,255,255,${opacity});border:1px solid rgba(255,255,255,.1);border-radius:${5*scale}px;padding:${4*scale}px ${7*scale}px;margin-bottom:${3*scale}px;">
         <div style="display:flex;align-items:center;gap:${4*scale}px;">
           <div style="width:${15*scale}px;height:${15*scale}px;border-radius:${3*scale}px;background:rgba(0,0,0,.25);color:#fff;display:flex;align-items:center;justify-content:center;font-size:${7*scale}px;font-weight:700;flex-shrink:0">${i+1}</div>
-          <span style="flex:1;font-size:${8*scale}px;font-weight:600;color:${ic};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${item.label}</span>
-          <span style="font-size:${9*scale}px;font-weight:800;color:${item.color}">${item.vote_count}</span>
+          <span style="flex:1;font-size:${Math.min(itemFS,14)*scale}px;font-weight:900;color:${ic};text-shadow:0 1px 3px rgba(0,0,0,.6);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${item.label}</span>
+          <span style="font-size:${9*scale}px;font-weight:800;color:${cc||item.color}">${item.vote_count}</span>
         </div>
         <div style="margin-top:${2*scale}px;height:${2*scale}px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden">
-          <div style="width:${bp}%;height:100%;background:${item.color}"></div>
+          <div style="width:${bp}%;height:100%;background:${cc||item.color}"></div>
         </div>
       </div>`;
     }).join('');
