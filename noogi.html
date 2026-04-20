@@ -41,9 +41,9 @@ body{
 
 .content{
   position:relative;z-index:5;
-  width:100%;max-width:960px;
-  padding:18px 40px 40px;
-  margin-top:-20px;
+  width:100%;max-width:1100px;
+  padding:28px 40px 40px;
+  margin-top:0;
   display:flex;flex-direction:column;align-items:center;gap:0;
   opacity:0;transition:opacity .5s;
 }
@@ -100,6 +100,11 @@ body{
 
 /* ITEMS */
 .items-wrap{width:100%;display:flex;flex-direction:column;}
+.items-wrap.two-col{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  align-items:start;
+}
 .vote-item{
   position:relative;
   border-radius:16px;padding:16px 20px;
@@ -293,13 +298,21 @@ function renderItems(){
   const scale=(S.display_scale||100)/100;
   const opacity=(S.item_opacity??30)/100;
   const bgColor=S.bg_color||'#0B0B15';
-  // Use admin-set item_text_color or auto-compute based on opacity
   const hasOverride=!!S.item_text_color;
   const autoTxtColor=itemTextColor(bgColor,opacity,hasOverride?S.item_text_color:null);
   const itemFontSize=S.item_font_size||16;
   const countColor=S.count_color||null;
+  const countFontSize=S.count_font_size||30;
+  const colBreak=S.col_break||8;
+  const twoCol=sorted.length>=colBreak;
 
   wrap.style.gap=Math.round(10*scale)+'px';
+  wrap.classList.toggle('two-col',twoCol);
+  if(twoCol){
+    wrap.style.columnGap=Math.round(14*scale)+'px';
+    wrap.style.rowGap=Math.round(10*scale)+'px';
+    wrap.style.gap='';
+  }
 
   if(!sorted.length){
     wrap.innerHTML='';
@@ -341,7 +354,7 @@ function renderItems(){
             ${item.description?`<div class="item-desc" style="font-size:${Math.round(11*scale)}px">${item.description}</div>`:''}
           </div>
           <div class="item-right">
-            <div class="item-count" id="icnt-${item.id}" style="font-size:${Math.round(30*scale)}px;color:${countColor||item.color}">${item.vote_count}</div>
+            <div class="item-count" id="icnt-${item.id}" style="font-size:${Math.round(countFontSize*scale)}px;color:${countColor||item.color}">${item.vote_count}</div>
             <div class="item-pct" id="ipct-${item.id}" style="font-size:${Math.round(12*scale)}px;color:${countColor||'rgba(255,255,255,.7)'}">${pct}%</div>
           </div>
         </div>
@@ -355,7 +368,7 @@ function renderItems(){
       const rnk=document.getElementById('irk-'+item.id);
       const bgf=document.getElementById('ibf-'+item.id);
       const lbl=document.getElementById('ilbl-'+item.id);
-      if(cnt){cnt.textContent=item.vote_count;cnt.style.color=countColor||item.color;cnt.style.fontSize=Math.round(30*scale)+'px';}
+      if(cnt){cnt.textContent=item.vote_count;cnt.style.color=countColor||item.color;cnt.style.fontSize=Math.round(countFontSize*scale)+'px';}
       if(pctEl){pctEl.textContent=pct+'%';pctEl.style.color=countColor||'rgba(255,255,255,.7)';}
       if(bar){bar.style.width=barPct+'%';bar.style.background=countColor||item.color;}
       if(rnk){rnk.textContent=idx+1;rnk.style.width=rankSize+'px';rnk.style.height=rankSize+'px';rnk.style.fontSize=Math.round(13*scale)+'px';}
